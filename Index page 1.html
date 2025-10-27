@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web-of-lies</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      font-family: 'Geo', sans-serif;
+      color: #cf0000;
+      overflow-x: hidden; /* allow vertical scrolling, block horizontal overflow */
+      -webkit-overflow-scrolling: touch; /* smooth scroll on iOS */
+    }
+
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background: rgba(31, 29, 29, 0.13);
+      padding: 2rem 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    h1 {
+      max-width: 90%;
+      font-size: 5rem;
+      color: #f00000;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 1px #2a0737;
+      text-align: center;
+      word-wrap: break-word;
+    }
+
+    p {
+      max-width: 90%;
+      font-size: 3rem;
+      text-align: left;
+      color: #fe1428;
+      text-shadow: 0 0 4px #e80a2c;
+      margin-bottom: 2rem;
+      word-wrap: break-word;
+    }
+
+    .button {
+      background-color: #e51d1d;
+      display: flex;
+      justify-content: left;
+      align-items: left;
+      color: #580a0c;;
+      border: none;
+      padding: 1px 24px;
+      font-size: 2rem;
+      cursor: arrow;
+      border-radius: 4px;
+      text-decoration: none;
+      box-shadow: 0 0 10px #ee428c;
+      transition: background 0.3s ease;
+      display: inline-block;
+    }
+
+    .button:hover {
+      background-color: #b3121f;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      z-index: 1;
+      pointer-events: none; /* prevent canvas from blocking touches */
+    }
+
+    a {
+    color: #f30327;;
+    text-decoration: none;
+    word-break: break-word; /* Ensure long URLs wrap on small screens */
+  }
+
+    .alert-box {
+      position: fixed;
+      top: 30%;
+      left: 40%;
+      transform: translate(-50%, -50%);
+      background-color: #990e0e;
+      border: 2px solid rgb(47, 0, 3);
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(255, 57, 153, 0.669);
+      z-index: 2000;
+      display: none;
+      text-align: center;
+      font-family: 'Geo', sans-serif;
+      color: #0e0024;
+      max-width: 95%;
+      width: 400px;
+      box-sizing: border-box;
+    }
+    .alert-box button:hover {
+      background-color: darkmagenta;
+    }
+
+    @media (max-width: 1024px) {
+      h1 { font-size: 4rem; }
+      p { font-size: 1.8rem; }
+      .button { font-size: 1.8rem; padding: 10px 20px; }
+    }
+
+    @media (max-width: 768px) {
+      #overlay { padding: 1.2rem 0.5rem; }
+      h1 { font-size: 2.5rem; }
+      p { font-size: 1.2rem; }
+      .button { font-size: 1.5rem; padding: 8px 16px; }
+      .alert-box {
+        width: auto;
+        margin-left: 30px;
+        margin-right: 10px;
+      }
+      .alert-box p { font-size: 1.5rem; }
+      .alert-box button { font-size: 1.1rem; padding: 10px 20px; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.8rem; }
+      p { font-size: 1rem; }
+      .button { font-size: 1.2rem; padding: 6px 12px; }
+      .alert-box p { font-size: 1.2rem; }
+      .alert-box button { font-size: 1rem; padding: 8px 15px; }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="spiral.js" defer></script>
+</head>
+<body>
+  <div id="overlay">
+    <h1>Amelie Vorchheimer</h1>
+    <p>
+      <a href="Aboutme.html" >About Me</a>
+      <br><br>
+      <br><br>
+      <a href="past works.html"  >Works</a>
+      <br><br><br>
+    </p>
+    <a class="button" href="Openingpage.html">home</a>
+  </div>
+  <footer>
+    <p>lets see</p>
+  </footer>
+  <div id="customAlert" class="alert-box">
+    <p>
+      Move to SECTION ONE and await further instruction
+      <br>
+      Click *STUCK* once completed task
+    </p>
+    <button id="alertDoneButton">STUCK</button>
+  </div>
+</body>
+</html>
