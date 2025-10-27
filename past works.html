@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Past Projects - Amelie Vorchheimer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Geo', sans-serif;
+      background: #000000;
+      color: #ff0000;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .desktop {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      width: 100vw;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 120px);
+      grid-gap: 30px;
+      align-content: start;
+      overflow-y: auto;
+    }
+
+    .folder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .folder:hover {
+      transform: scale(1.1);
+    }
+
+    .folder-icon {
+      width: 80px;
+      height: 80px;
+      background: #ff0000;
+      clip-path: polygon(0% 15%, 40% 15%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .folder-icon::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      height: 50%;
+      background: #000000;
+      clip-path: polygon(20% 30%, 80% 30%, 70% 70%, 30% 70%);
+    }
+
+    .folder-name {
+      color: #ff0000;
+      font-size: 0.95rem;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+      word-wrap: break-word;
+      max-width: 120px;
+    }
+
+    .window {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      border: 3px solid #ff0000;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+      min-width: 600px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .window.active {
+      display: flex;
+    }
+
+    .window-header {
+      background: #ff0000;
+      color: #000000;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      user-select: none;
+    }
+
+    .window-title {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .close-btn {
+      background: #000000;
+      color: #ff0000;
+      border: 2px solid #000000;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #ff0000;
+      color: #000000;
+      border-color: #ff0000;
+    }
+
+    .window-content {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(90vh - 50px);
+      color: #ff0000;
+    }
+
+    .window-content h2 {
+      color: #ff0000;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.6);
+    }
+
+    .window-content p {
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #ff4444;
+      font-size: 0.9rem;
+    }
+
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .gallery-item {
+      width: 100%;
+      height: 450px;
+      background: #1a0000;
+      border: 2px solid #ff0000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff0000;
+      font-size: 0.8rem;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-container {
+      margin: 20px 0;
+      border: 2px solid #ff0000;
+      background: #1a0000;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: auto;
+    }
+
+    .links {
+      margin: 15px 0;
+    }
+
+    .links a {
+      color: #ff0000;
+      text-decoration: none;
+      display: block;
+      margin: 5px 0;
+      transition: text-shadow 0.2s;
+    }
+
+    .links a:hover {
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+    .home-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ff0000;
+      color: #000000;
+      border: none;
+      padding: 12px 24px;
+      font-family: 'Geo', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+      transition: all 0.3s;
+      z-index: 999;
+    }
+
+    .home-btn:hover {
+      background: #cc0000;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
+    }
+
+    @media (max-width: 768px) {
+      .desktop {
+        grid-template-columns: repeat(auto-fill, 100px);
+        grid-gap: 20px;
+        padding: 15px;
+      }
+
+      .folder-icon {
+        width: 60px;
+        height: 60px;
+      }
+
+      .window {
+        min-width: 95vw;
+        max-width: 95vw;
+      }
+
+      .window-content {
+        padding: 15px;
+      }
+
+      .image-gallery {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  
+  <div class="desktop" id="desktop">
+    <div class="folder" data-work="work1">
+      <div class="folder-icon"></div>
+      <div class="folder-name">What it it that it is</div>
+    </div>
+    <div class="folder" data-work="work2">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Visualised Screaming</div>
+    </div>
+    <div class="folder" data-work="work3">
+      <div class="folder-icon"></div>
+      <div class="folder-name">I have Detained your attention</div>
+    </div>
+    <div class="folder" data-work="work4">
+      <div class="folder-icon"></div>
+      <div class="folder-name">From Glen Waverly</div>
+    </div>
+    <div class="folder" data-work="work5">
+      <div class="folder-icon"></div>
+      <div class="folder-name">A fragment</div>
+    </div>
+    <div class="folder" data-work="work6">
+      <div class="folder-icon"></div>
+      <div class="folder-name">C.me</div>
+    </div>
+    <div class="folder" data-work="work7">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Watching the watcher</div>
+    </div>
+    <div class="folder" data-work="work8">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Cheap Solutions</div>
+    </div>
+    <div class="folder" data-work="work9">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Untitled Collab</div>
+    </div>
+    <div class="folder" data-work="work10">
+      <div class="folder-icon"></div>
+      <div class="folder-name">P5.js Projects</div>
+    </div>
+    <div class="folder" data-work="work11">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Photography</div>
+    </div>
+    <div class="folder" data-work="work12">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Design</div>
+    </div>
+  </div>
+
+  <!-- Work 1 Window -->
+  <div class="window" id="work1">
+    <div class="window-header">
+      <span class="window-title">What it it that it is</span>
+      <button class="close-btn" onclick="closeWindow('work1')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>What it it that it is</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="what is it1.jpeg" alt="What it is that it is - Image 1"></div>
+        <div class="gallery-item"><img src="what is it 2.jpeg" alt="What it is that it is - Image 2"></div>
+        <div class="gallery-item"><img src="what is it 3.jpeg" alt="What it is that it is - Image 3"></div>
+        <div class="gallery-item"><img src="what is it4.jpeg" alt="What it is that it is - Image 4"></div>
+      </div>
+      <p>What is it that is was a multi phase social constructivism project that explored cognitive development techniques in response to neurodeterioration as a result of the attention economy. It was positioned as a research project, that aimed to create community adhesion. There were 5 main iterations, Professional business meeting, Happening #1, What is it that it is, Mediated Brainstorm and A fragment. Each was conducted in a different location with a different group of people. The intention was to connect people from different demographic through different means of communication such as drawing, prompt cards, music and interactive work. This project is ongoing throughout my practice as I seek to unpack the impacts of vocabulary and social skill loss as a result of internet use.</p>
+    </div>
+  </div>
+
+  <!-- Work 2 Window -->
+  <div class="window" id="work2">
+    <div class="window-header">
+      <span class="window-title">Visualised Screaming, 2024</span>
+      <button class="close-btn" onclick="closeWindow('work2')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Visualised Screaming, 2024</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="visualised screaming.jpeg" alt="Visualised Screaming - Image 1"></div>
+      </div>
+      <p>Visualised Screaming emerged from the data and recordings collected in What is it that it is. Using a spectrum analyser, I translated spoken audio from the discussions into visual forms. This transformation critiqued algorithmic systems that continuously analyse human behaviour for consumption. By creating a "redundant" form of analysis, the work questions how digital systems absorb and commodify emotion. Images show work presented in a range of spaces inc. miscellania melbourne.</p>
+    </div>
+  </div>
+
+  <!-- Work 3 Window -->
+  <div class="window" id="work3">
+    <div class="window-header">
+      <span class="window-title">I have Detained your attention, 2025</span>
+      <button class="close-btn" onclick="closeWindow('work3')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>I have Detained your attention, 2025</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="algorythmicmeditations.jpeg" alt="I have Detained your attention - Image 1"></div>
+      </div>
+      <p>This ongoing project extends my investigation into human–machine dynamics. Presented as an immersive installation, it combines sound, interactive media, floor decals, and a website to question surveillance and autonomy. Within this environment, the machine assumes control, dictating how audiences move and listen. The installation draws on social constructivism, liminality, and intersectional feminist theory to consider how data and behaviour intersect in algorithmic spaces.</p>
+      <p>Part of the work includes Algorithmic Meditations, a code-based sound generator where code itself performs agency. The audience becomes the instrument, translating generative audio into physical gestures.</p>
+    </div>
+  </div>
+
+  <!-- Work 4 Window -->
+  <div class="window" id="work4">
+    <div class="window-header">
+      <span class="window-title">From Glen Waverly</span>
+      <button class="close-btn" onclick="closeWindow('work4')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>From Glen Waverly</h2>
+      <div class="video-container">
+        <video controls>
+          <source src="train.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="train2.png" alt="From Glen Waverly - Image 1"></div>
+        <div class="gallery-item"><img src="train3.png" alt="From Glen Waverly - Image 2"></div>
+      </div>
+      <p>These are a series of videos that are made from phone recordings out the window of a train. I attempted to induce a feeling of anxiety and dissociation. These feelings are often associated with my personal experience of disengagement with an experience as dictated by digital worlds. I started using the method of "encryption". The purpose of applying it to this practice is to mirror the experience of complete loss of context and understanding that comes with dissociation through technology.</p>
+      <p>This work has been displayed as Part of the RMIT IDAHOBIT Exhibition 2025, Fozza Presents 2025, Cross Pollination 2025, and POP POP, 2025.</p>
+    </div>
+  </div>
+
+  <!-- Work 5 Window -->
+  <div class="window" id="work5">
+    <div class="window-header">
+      <span class="window-title">A fragment, 2024</span>
+      <button class="close-btn" onclick="closeWindow('work5')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>A fragment, 2024</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="fragment.jpeg" alt="A fragment - Image 1"></div>
+        <div class="gallery-item"><img src="fragment2.jpeg" alt="A fragment - Image 2"></div>
+        <div class="gallery-item"><img src="fragment3.jpeg" alt="A fragment - Image 3"></div>
+      </div>
+      <p>A fragment, 2024, was an art exhibition and music event curated in collaboration with Hannah Ogawa. Our intention was to create a site of refusal that sat within the "third space" as a means of rebuilding predefined structures through refusal. The event featured 14 artists and 5 DJs, with a mixture of digital and physical installation works, and an iteration of What is it that it is (2024). Images show installation.</p>
+    </div>
+  </div>
+
+  <!-- Work 6 Window -->
+  <div class="window" id="work6">
+    <div class="window-header">
+      <span class="window-title">C.me 2025</span>
+      <button class="close-btn" onclick="closeWindow('work6')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>C.me 2025</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="c me.png" alt="C.me - Image 1"></div>
+      </div>
+      <p>A fragment, 2024, was an art exhibition and music event curated in collaboration with Hannah Ogawa. Our intention was to create a site of refusal that sat within the "third space" as a means of rebuilding predefined structures through refusal. The event featured 14 artists and 5 DJs, with a mixture of digital and physical installation works, and an iteration of What is it that it is (2024).</p>
+      <p>Images show stills of the work. c.me 2025 was shortlisted for the Counihan gallery summer show 2025.</p>
+    </div>
+  </div>
+
+  <!-- Work 7 Window -->
+  <div class="window" id="work7">
+    <div class="window-header">
+      <span class="window-title">Watching the watcher 2025</span>
+      <button class="close-btn" onclick="closeWindow('work7')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Watching the watcher 2025</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="watching.png" alt="Watching the watcher - Image 1"></div>
+        <div class="gallery-item"><img src="watching2.png" alt="Watching the watcher - Image 2"></div>
+      </div>
+      <p>In response to my iterative project last year, What is it that it is (2024 - ongoing), which explored methods for engaging participants in critical discourse and community building, I created a work that explored the underlying themes that inspired the work. Data mining and attention capitalism dictates the spaces we use online, harvesting our time and attention through systems of analysis that were developed to form algorithms. I created my own system of analysis using the recordings from my previous project, by placing them through phase analysis and then attempting to trace this image in real time. To create the sound that was analysed, I layered them over themselves until they were unable to be heard, thus 'encrypting' the information so that only I knew it's true meaning. The work addresses surveillance of information online and how we are constantly survielled even when we feel we are surveilling.</p>
+      <p>The work places the audience in a position of analyser, whilst inhibiting them from understanding the contexts of the content. This aims to be a replication of the way that information is communicated online.</p>
+      <p>Images capture stills from the work and documentation of it exhibited Intersections, 2025.</p>
+    </div>
+  </div>
+
+  <!-- Work 8 Window -->
+  <div class="window" id="work8">
+    <div class="window-header">
+      <span class="window-title">Cheap Solutions 2025</span>
+      <button class="close-btn" onclick="closeWindow('work8')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Cheap Solutions 2025</h2>
+      <div class="video-container">
+        <video controls>
+          <source src="nature_1.mp4" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+      </div>
+      <p>When the environment fails to regrow, where does that leave us?</p>
+      <p>Donna Haraway argues "the cyborg as a fiction mapping our social and bodily reality", suggesting that due to our reliance and compliance with technological realities, we have become cyborgian creatures. This consumer culture, existing to numb us, removes us from the reality that is the acceleration of the destruction of Earth. Online, the information we consume has the potential to teach us, whether real or false information. Drawing on a culture built on information economies, this work questions you.</p>
+      <p>What do you do with the information provided to you?</p>
+      <p>How do you reclaim autonomy from machines that exist to spread misinformation?</p>
+      <p>Images document the work exhibited as part of Decay, 2025.</p>
+    </div>
+  </div>
+
+  <!-- Work 9 Window -->
+  <div class="window" id="work9">
+    <div class="window-header">
+      <span class="window-title">Untitled Collab with Lillah S-D</span>
+      <button class="close-btn" onclick="closeWindow('work9')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Untitled Collab with Lillah S-D</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="lillah.jpeg" alt="Untitled Collab - Image 1"></div>
+        <div class="gallery-item"><img src="lillah2.png" alt="Untitled Collab - Image 2"></div>
+      </div>
+      <p>In collaboration with Lillah Summers Dixon, I created Silenced, and Unitled. These works explored the role of men in the public eye, and how these spaces are dominated by upper class, "professionals". Our work explored drag as a form of expression, as we created a subversive replication of a sports commentary wering drag. We also documented an adventure through brunswick in drag, exploring the concept of masculinity and societal expectations of presentation.</p>
+      <p>These works were exhibited in Pride Pallette IDAHOBIT exhibition 2024 & 2025 & The RMIT Gradute Exhibtion 2024</p>
+    </div>
+  </div>
+
+  <!-- Work 10 Window -->
+  <div class="window" id="work10">
+    <div class="window-header">
+      <span class="window-title">P5.js Projects</span>
+      <button class="close-btn" onclick="closeWindow('work10')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>P5.js Projects</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="coding.png" alt="P5.js Projects - Image 1"></div>
+      </div>
+      <p>A large portion of my work explores digital interactive media.</p>
+      <p>A key work is Omission of self awareness, displayed at RMIT open day 2025</p>
+      <p>We are all aware of the existence of surveillance in "developed" society. This looks like cameras, biorecognition and even body tracking. This poses a scary reality for those who seek to disrupt systems of oppression through protest and organised changemaming, as more than ever we are able to be tracked.</p>
+      <p>In other ways too we are able to be tracked, out mobile devices, popping up in the back of people's photos, and our data online. Privacy is suddenly only a construct.</p>
+      <p>However, what happens when surveillance becomes the spectacle.</p>
+      <div class="links">
+        <p>You can access some selected projects created in p5.js below:</p>
+        <a href="https://editor.p5js.org/amelievorsh/full/ZhxIn1YLu" target="_blank">The ommission of self awareness</a>
+        <a href="https://editor.p5js.org/amelievorsh/full/DqP3bBBcq" target="_blank">Toxic Touch</a>
+        <a href="https://editor.p5js.org/amelievorsh/full/2dkgkmSzB" target="_blank">IPID</a>
+        <a href="https://editor.p5js.org/amelievorsh/sketches/659c0-6c3" target="_blank">Audio Reactive bulb</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Work 11 Window -->
+  <div class="window" id="work11">
+    <div class="window-header">
+      <span class="window-title">Photography</span>
+      <button class="close-btn" onclick="closeWindow('work11')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Photography</h2>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="photog1.jpeg" alt="Photography - Image 1"></div>
+        <div class="gallery-item"><img src="photog2.jpeg" alt="Photography - Image 2"></div>
+        <div class="gallery-item"><img src="photog3.jpeg" alt="Photography - Image 3"></div>
+        <div class="gallery-item"><img src="photog4.jpeg" alt="Photography - Image 4"></div>
+      </div>
+      <p>Photography is the backbone of my practice. I have been a photographer since 2020 with a keen interest in capturing moments that seem unimportant. My photography practice privileges interpersonal and personal moments of expression, rather than documentation or experimentation. I use photography as a medium for exploring private and public recollection of experience.</p>
+    </div>
+  </div>
+
+  <!-- Work 12 Window -->
+  <div class="window" id="work12">
+    <div class="window-header">
+      <span class="window-title">Design</span>
+      <button class="close-btn" onclick="closeWindow('work12')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>Design</h2>
+      <p>Key projects:</p>
+      <p>- Designer for vis ink - cover art, selection of images 2024</p>
+      <p>- Design for drawing Club promotion 2025</p>
+      <p>- Website design (personal)</p>
+    </div>
+  </div>
+
+  <button class="home-btn" onclick="window.location.href='Index page 1.html'">HOME</button>
+
+  <script>
+    // Interactive Background Canvas
+    const canvas = document.getElementById('backgroundCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
+    let particles = [];
+    
+    class Particle {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 3 - 1.5;
+        this.speedY = Math.random() * 3 - 1.5;
+        this.life = 100;
+      }
+      
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        
+        const dx = mouseX - this.x;
+        const dy = mouseY - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 100) {
+          const force = (100 - distance) / 100;
+          this.x -= (dx / distance) * force * 2;
+          this.y -= (dy / distance) * force * 2;
+        }
+        
+        this.life -= 0.5;
+      }
+      
+      draw() {
+        ctx.fillStyle = `rgba(255, 0, 0, ${this.life / 100})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = `rgba(255, 0, 0, ${this.life / 200})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+    }
+    
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      if (Math.random() < 0.3) {
+        particles.push(new Particle(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height
+        ));
+      }
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        
+        if (particles[i].life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      // Draw connections between nearby particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 80) {
+            ctx.strokeStyle = `rgba(255, 0, 0, ${(1 - distance / 80) * 0.2})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      // Draw glow around mouse
+      const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 100);
+      gradient.addColorStop(0, 'rgba(255, 0, 0, 0.1)');
+      gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      requestAnimationFrame(animate);
+    }
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      // Create particles at mouse position
+      if (Math.random() < 0.5) {
+        particles.push(new Particle(mouseX, mouseY));
+      }
+    });
+    
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    
+    animate();
+
+    // Folder and Window Management
+    const folders = document.querySelectorAll('.folder');
+    const windows = document.querySelectorAll('.window');
+
+    folders.forEach(folder => {
+      folder.addEventListener('click', () => {
+        const workId = folder.getAttribute('data-work');
+        openWindow(workId);
+      });
+    });
+
+    function openWindow(workId) {
+      const window = document.getElementById(workId);
+      window.classList.add('active');
+    }
+
+    function closeWindow(workId) {
+      const window = document.getElementById(workId);
+      window.classList.remove('active');
+    }
+
+    // Draggable windows
+    windows.forEach(win => {
+      const header = win.querySelector('.window-header');
+      let isDragging = false;
+      let currentX;
+      let currentY;
+      let initialX;
+      let initialY;
+      let xOffset = 0;
+      let yOffset = 0;
+
+      header.addEventListener('mousedown', dragStart);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', dragEnd);
+
+      function dragStart(e) {
+        if (e.target.classList.contains('close-btn')) return;
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+        if (e.target === header || e.target.classList.contains('window-title')) {
+          isDragging = true;
+        }
+      }
+
+      function drag(e) {
+        if (isDragging) {
+          e.preventDefault();
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+          xOffset = currentX;
+          yOffset = currentY;
+          setTranslate(currentX, currentY, win);
+        }
+      }
+
+      function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+      }
+
+      function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate(calc(-50% + ${xPos}px), calc(-50% + ${yPos}px))`;
+      }
+    });
+  </script>
+</body>
+</html>

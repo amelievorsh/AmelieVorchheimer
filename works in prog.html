@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>hi girls</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      font-family: 'Geo', monospace;
+      background-color: black;
+    }
+    
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      background: transparent;
+      padding: 2rem 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .top-left {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      color: #cd0011;
+      font-size: 5rem;
+      text-shadow: 0 0 5px #ef5c6b;
+    }
+
+    .artist-info {
+      position: absolute;
+      top: 150px; /* Adjust this value to position it below the top-left text */
+      left: 20px;
+      right: 60px;
+      max-width: 90%;
+      font-size: 1.5rem;
+      text-align: left;
+      color: #ff0019;
+      text-shadow: 0 0 4px #e73b3d;
+      margin-bottom: 2rem;
+      word-wrap: break-word;
+    }
+
+    nav {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      z-index: 1; /* Lower z-index for the canvas */
+      pointer-events: none;
+    }
+
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+    }
+
+    .clickable-image {
+      border: 0px solid lime;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 1px;
+      font-family: "Geo", monospace;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% {
+        opacity: 0.4;
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
+  <script src="spiral.js"></script>
+</head>
+<body>
+
+  <div id="overlay">
+    <div class="top-left">Amelie Vorchheimer -- A \/oid</div>
+    <div class="artist-info"> <break>
+    </break>
+    BIO
+    <hr style="background-color: red; height: 2px; border: none;">
+    Amelie is a queer multimedia artist working in Naarm Australia who works with video, installation, sound, 
+    <br>
+    and new media art to explore non-violent forms of changemaking in response to identity politics online. <br>
+    Due to finish their Bachelor of Fine Arts in January 2026, they are focused on community-based practice, <br>
+    running the RMIT drawing club and hosting a number of DIY exhibitions. <br>
+    Their research unpacks the impacts and potential responses to the attention economy, <br>
+    unpacking the rhizomatic nature of data mining practices, neurodegeneration and ability to critically engage. <br>
+    Amelie’s practice dissects current uses and interactions with online spaces,<br>
+     and how this impacts interpersonal relationships. <br>
+    Their practice aims to create a space that doubles as a site for inclusive engagement and play, <br>
+    fostering critical engagement and reclamation of digital spaces. 
+    <br><br>
+    <hr style="background-color: red; height: 2px; border: none;">
+    <br><br>
+    CV
+<br>
+<hr style="background-color: red; height: 2px; border: none;">
+Personal details <br>
+Amelie Vorchheimer <br>
+amelievorsh@gmail.com <br>
+@swayingelegantly<br><br>
+
+
+Education<br>
+Cert III -  Music (Sound Production) 2022<br>
+BA (Fine Arts Drawing) RMIT, (est completion 2025)<br><br>
+
+
+
+Selected Group Exhibitions<br>
+2025 “summer show” Shortlist, Counihan Gallery<br>
+2025 “POP POP” 612 Nicholls building, Practice Lab (melbourne university)<br>
+2025 “Intersections II” Brunswick Baptist Church, Sculpture Club RMIT<br>
+2025 “Q Files” Unassigned Gallery <br>
+2024 “Dark Arts” Miscellania<br>
+2024  “IDAHOBIT Pride Pallette” site eight RMIT<br><br>
+
+Design Work <br>
+2024 - Designer Vis Ink (student publication) <br>
+2025 - Poster Design / Promotion Design RMIT Drawing Club <br><br>
+<hr style="background-color: red; height: 2px; border: none;">
+
+
+
+
+
+    </div>
+    <div class="bottom-right">
+      <a href="Index page 1.html">
+        <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image" />
+      </a>
+      <div class="caption">home</div>
+    </div>
+  </div>
+
+</body>
+</html>
