@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Unified Data Feed - Face & Body Trackers (Firebase)</title>
+  <style>
+  :root {
+    --bg-color: #000;
+    --text-color: #0f0;
+    --accent-color: #f00;
+    --border-color: #0f0;
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Courier New', monospace;
+    background: var(--bg-color);
+    color: var(--text-color);
+    overflow: hidden;
+    padding: 10px;
+  }
+
+  #header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 20px;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px var(--text-color);
+  }
+
+  #statusBar {
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .status-group {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .tracker-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .status-dot {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent-color);
+  }
+
+  .status-dot.active {
+    background: var(--text-color);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  #dataFeed {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+    padding-right: 10px;
+  }
+
+  #dataFeed::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #dataFeed::-webkit-scrollbar-track {
+    background: #111;
+  }
+
+  #dataFeed::-webkit-scrollbar-thumb {
+    background: var(--text-color);
+  }
+
+  .data-entry {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.133);
+    border-radius: 0px;
+    font-size: 13px;
+    line-height: 1.6em;
+    min-height: 100px;
+  }
+
+  .waiting-message {
+    grid-column: span 2;
+    text-align: center;
+    padding: 40px;
+    color: #888;
+    font-size: 14px;
+  }
+
+  .waiting-message .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 255, 0, 0.3);
+    border-top-color: var(--text-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 10px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  #instructions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.95);
+    border: 2px solid var(--text-color);
+    padding: 15px;
+    max-width: 350px;
+    font-size: 12px;
+    z-index: 100;
+  }
+
+  #instructions h3 {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  #instructions button {
+    margin-top: 10px;
+    padding: 8px 15px;
+    background: var(--text-color);
+    color: var(--bg-color);
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: bold;
+  }
+  </style>
+</head>
+<body>
+  <div id="header">
+    <h1>◉ UNIFIED DATA FEED - FACE & BODY TRACKERS</h1>
+    <div id="statusBar">
+      <div class="status-group">
+        <div class="tracker-status">
+          <span class="status-dot" id="dotFaceMesh"></span>
+          <span>FACE_MESH</span>
+          <span id="countFaceMesh">0</span>
+        </div>
+        <div class="tracker-status">
+          <span class="status-dot" id="dotBody"></span>
+          <span>BODY_POSE</span>
+          <span id="countBody">0</span>
+        </div>
+      </div>
+      <div class="status-group">
+        <div>TOTAL: <span id="totalCount">0</span></div>
+        <div>UPTIME: <span id="uptime">00:00:00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="dataFeed">
+    <div class="waiting-message">
+      <div class="spinner"></div>
+      <div style="font-size: 16px; margin-bottom: 10px;">WAITING FOR FIREBASE STREAMS...</div>
+      <div style="font-size: 12px;">
+        Open the tracker pages on ANY device to start receiving data.<br>
+        <strong>FACE_MESH_TRACKER</strong> • <strong>BODY_POSE_TRACKER</strong>
+      </div>
+    </div>
+  </div>
+
+  <div id="instructions">
+    <h3>📋 UNIFIED DATA FEED</h3>
+    <p><strong>This page receives data from face and body trackers across all devices</strong></p>
+    
+    <p style="margin-top: 15px;"><strong>Supported Trackers:</strong></p>
+    <ul>
+      <li><strong>FACE_MESH_TRACKER</strong> - Face mesh animation</li>
+      <li><strong>BODY_POSE_TRACKER</strong> - Body gesture detection</li>
+    </ul>
+
+    <p style="margin-top: 15px;"><strong>Cross-Device Features:</strong></p>
+    <ul>
+      <li>✓ Works across different devices</li>
+      <li>✓ No same-origin requirement</li>
+      <li>✓ Real-time synchronization</li>
+      <li>✓ Persistent data storage (via Firebase)</li>
+    </ul>
+
+    <div class="note">
+      <strong>How it works:</strong> Uses Firebase Realtime Database for cross-device communication. Open trackers on any device and view the data feed here!
+    </div>
+
+    <button style="margin-top: 15px;" onclick="this.parentElement.style.display='none'">CLOSE</button>
+  </div>
+
+  <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-database.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9T0hhAF8KDWRIQZsiBdneslvx3mlgYU4",
+      authDomain: "buffer02-40ffe.firebaseapp.com",
+      databaseURL: "https://buffer02-40ffe-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "buffer02-40ffe",
+      storageBucket: "buffer02-40ffe.firebasestorage.app",
+      messagingSenderId: "213473674962",
+      appId: "1:213473674962:web:60bbde3c9303b3c06a4f0b",
+      measurementId: "G-ZTJW8P42SP"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const CONFIG = {
+      storageKeys: {
+        // *** MODIFIED PART: Updated keys to be Firebase paths ***
+        face: 'data/face_mesh_data',
+        body: 'data/body_pose_data'
+      },
+      maxEntries: 100,
+      autoScroll: true
+    };
+
+    const dataFeed = document.getElementById('dataFeed');
+    const totalCount = document.getElementById('totalCount');
+    const uptimeDisplay = document.getElementById('uptime');
+
+    let trackerCounts = { FACE_MESH_TRACKER: 0, BODY_POSE_TRACKER: 0 };
+    let totalReceived = 0;
+    let lastTimestamps = { face: 0, body: 0 };
+    const startTime = Date.now();
+
+    // *** MODIFIED PART: Removed polling functions ***
+    
+    function handleIncomingData(dataType, data) {
+      const waitingMsg = dataFeed.querySelector('.waiting-message');
+      if (waitingMsg) waitingMsg.remove();
+
+      const trackerMap = {
+        'FACE_MESH_TRACKER': { dot: 'dotFaceMesh', count: 'countFaceMesh' },
+        'BODY_POSE_TRACKER': { dot: 'dotBody', count: 'countBody' }
+      };
+
+      const tracker = trackerMap[data.tracker];
+      if (!tracker) return;
+
+      trackerCounts[data.tracker]++;
+      document.getElementById(tracker.dot).classList.add('active');
+      document.getElementById(tracker.count).textContent = trackerCounts[data.tracker];
+      totalReceived++;
+      totalCount.textContent = totalReceived;
+
+      let formattedEntry;
+      if (dataType === 'FACE_MESH_DATA') formattedEntry = formatFaceMeshEntry(data, totalReceived);
+      else if (dataType === 'BODY_GESTURE_DATA') formattedEntry = formatBodyGestureEntry(data, totalReceived);
+
+      if (formattedEntry) {
+        appendEntry(formattedEntry);
+      }
+
+      // Remove active status after 1 second
+      setTimeout(() => {
+        document.getElementById(tracker.dot).classList.remove('active');
+      }, 1000);
+    }
+
+    function formatFaceMeshEntry(data, count) {
+      const timestamp = new Date(data.timestamp).toLocaleString();
+      return {
+        html: `<div class="data-entry"><strong>${data.tracker}</strong> #${count}<br>
+        ${timestamp}
+        Faces: ${data.facesDetected}
+        Keypoints: ${data.keypoints}
+        Triangles: ${data.triangles}
+        Face Center: (${data.faceCenter.x}, ${data.faceCenter.y})
+        Face Size: ${data.faceSize}px</div>`
+      };
+    }
+
+    function formatBodyGestureEntry(data, count) {
+      const timestamp = new Date(data.timestamp).toLocaleString();
+      const gestureList = data.gestures && data.gestures.length > 0 
+        ? data.gestures.map(g => g.replace(/_/g, ' ')).join(', ')
+        : 'None';
+      
+      return {
+        html: `<div class="data-entry"><strong>${data.tracker}</strong> #${count}<br>
+        ${timestamp}<br>
+        Bodies: ${data.bodiesDetected}<br>
+        Keypoints: ${data.totalKeypoints}<br>
+        Gestures: ${gestureList}<br>
+        Gesture Count: ${data.gestureCount}</div>`
+      };
+    }
+
+    function appendEntry(entryData) {
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = entryData.html;
+      const entry = tempDiv.firstChild;
+      
+      dataFeed.appendChild(entry);
+
+      const entries = dataFeed.querySelectorAll('.data-entry');
+      while (entries.length > CONFIG.maxEntries) {
+        dataFeed.removeChild(entries[0]);
+      }
+      
+      if (CONFIG.autoScroll) {
+        dataFeed.scrollTop = dataFeed.scrollHeight;
+      }
+    }
+
+    // Update uptime display
+    setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const h = Math.floor(elapsed / 3600000);
+      const m = Math.floor((elapsed % 3600000) / 60000);
+      const s = Math.floor((elapsed % 60000) / 1000);
+      uptimeDisplay.textContent = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+    }, 1000);
+
+    // *** MODIFIED PART: Set up Firebase Listeners ***
+    function setupFirebaseListeners() {
+      // Listen for Face Mesh data
+      const faceDataRef = ref(db, CONFIG.storageKeys.face);
+      onValue(faceDataRef, (snapshot) => {
+        try {
+          const data = snapshot.val();
+          if (data && data.timestamp > lastTimestamps.face) {
+            lastTimestamps.face = data.timestamp;
+            handleIncomingData('FACE_MESH_DATA', data);
+          }
+        } catch (error) {
+          console.error('Error processing face data:', error);
+        }
+      });
+
+      // Listen for Body Pose data
+      const bodyDataRef = ref(db, CONFIG.storageKeys.body);
+      onValue(bodyDataRef, (snapshot) => {
+        try {
+          const data = snapshot.val();
+          if (data && data.timestamp > lastTimestamps.body) {
+            lastTimestamps.body = data.timestamp;
+            handleIncomingData('BODY_GESTURE_DATA', data);
+          }
+        } catch (error) {
+          console.error('Error processing body data:', error);
+        }
+      });
+    }
+
+    setupFirebaseListeners();
+    
+    console.log('📡 Cross-device data feed initialized with Firebase');
+    console.log('Listening for data at:', CONFIG.storageKeys.face, 'and', CONFIG.storageKeys.body);
+  </script>
+</body>
+</html>
