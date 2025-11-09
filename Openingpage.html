@@ -4,9 +4,12 @@
   <meta charset="UTF-8" />
   <title>hi girls</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+  <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+
   <style>
     html, body {
       margin: 0;
@@ -17,7 +20,7 @@
       font-family: 'Geo', monospace;
       background-color: black;
     }
-    
+
     #overlay {
       position: absolute;
       top: 0;
@@ -43,18 +46,18 @@
       color: #cd0011;
       font-size: 5rem;
       text-shadow: 0 0 5px #7ec180;
+      line-height: 1.1;
     }
 
     .artist-info {
       position: absolute;
-      top: 150px; /* Adjust this value to position it below the top-left text */
+      top: 150px;
       left: 20px;
       max-width: 90%;
       font-size: 3rem;
       text-align: left;
       color: #dc2537;
       text-shadow: 0 0 4px #287a57;
-      margin-bottom: 2rem;
       word-wrap: break-word;
     }
 
@@ -75,7 +78,7 @@
       background-repeat: no-repeat;
       background-position: center center;
       background-attachment: fixed;
-      z-index: 1; /* Lower z-index for the canvas */
+      z-index: 1;
       pointer-events: none;
     }
 
@@ -87,9 +90,10 @@
     }
 
     .clickable-image {
-      border: 0px solid lime;
+      border: 0;
       cursor: pointer;
       width: 150px;
+      max-width: 40vw;
       transition: transform 0.3s ease;
     }
 
@@ -100,26 +104,161 @@
     .caption {
       font-size: 0.8rem;
       color: #ff0000;
-      margin-top: 1px;
-      font-family: "Geo", monospace;
+      margin-top: 4px;
       animation: blink 1s steps(1) infinite;
     }
 
     @keyframes blink {
-      50% {
-        opacity: 0.4;
+      50% { opacity: 0.4; }
+    }
+
+    /* -------- Responsive Adjustments -------- */
+    @media (max-width: 1024px) {
+      .top-left {
+        font-size: 3.5rem;
+        top: 15px;
+        left: 15px;
+      }
+
+      .artist-info {
+        top: 120px;
+        font-size: 2.2rem;
+        max-width: 85%;
+      }
+
+      .clickable-image {
+        width: 120px;
       }
     }
+
+    @media (max-width: 768px) {
+      .top-left {
+        font-size: 2.5rem;
+        top: 10px;
+        left: 10px;
+      }
+
+      .artist-info {
+        top: 90px;
+        font-size: 1.6rem;
+      }
+
+      .bottom-right {
+        bottom: 10px;
+        right: 10px;
+      }
+
+      .clickable-image {
+        width: 100px;
+      }
+
+      .caption {
+        font-size: 0.7rem;
+      }
+    }
+
+   /* -------- Responsive Adjustments -------- */
+@media (max-width: 1024px) {
+  .top-left {
+    font-size: 3.5rem;
+    top: 15px;
+    left: 15px;
+  }
+
+  .artist-info {
+    top: 120px;
+    font-size: 2.2rem;
+    max-width: 85%;
+  }
+
+  .bottom-right {
+    bottom: 40px; /* lower the GIF slightly on tablets */
+    right: 20px;
+  }
+
+  .clickable-image {
+    width: 130px;
+  }
+}
+
+@media (max-width: 768px) {
+  .top-left {
+    font-size: 2.5rem;
+    top: 10px;
+    left: 10px;
+  }
+
+  .artist-info {
+    top: 100px;
+    font-size: 1.8rem;
+  }
+
+  .bottom-right {
+    bottom: 60px; /* pushes GIF lower */
+    right: 10px;
+  }
+
+  .clickable-image {
+    width: 110px;
+  }
+
+  .caption {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .top-left {
+    position: relative;
+    font-size: 4rem;
+    text-align: center;
+    left: 0;
+    top: 0;
+    margin-top: 1rem;
+  }
+
+  .artist-info {
+    position: relative;
+    left: 0;
+    text-align: center;
+    font-size: 2rem;
+    margin: 1rem 0 3rem;
+  }
+
+  .bottom-right {
+    position: relative;
+    text-align: center;
+    margin-top: 15rem; /* moves GIF further down */
+    margin-bottom: 1rem;
+  }
+
+  #overlay {
+    justify-content: flex-start;
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .clickable-image {
+    width: 90px;
+  }
+
+  .caption {
+    font-size: 0.7rem;
+  }
+}
+
   </style>
+
+  <!-- p5.js scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
   <script src="Vector1.js"></script>
 </head>
-<body>
 
+<body>
   <div id="overlay">
-    <div class="top-left">Amelie Vorchheimer -- A \/oid</div>
-    <div class="artist-info">Artist * Web Designer * Musician</div>
+    <div class="top-left">Amelie Vorchheimer</div>
+    <div class="artist-info">Art * Creative Coding * Music</div>
     <div class="bottom-right">
       <a href="Index page 1.html">
         <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image" />
@@ -127,6 +266,5 @@
       <div class="caption">click me</div>
     </div>
   </div>
-
 </body>
 </html>
