@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>when your body is the tool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: 'Geo', sans-serif;
+      background-color: #34006b; /* <-- choose your base color */
+      position: relative;
+    }
+
+    /* Add the background image as a semi-transparent overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('script screenshot.jpg') no-repeat left center fixed;
+      background-size: cover;
+      opacity: 0.5; /* <-- adjust transparency (0.0 = fully transparent, 1.0 = opaque) */
+      z-index: 0; /* keeps it behind all content */
+    }
+
+    /* Top-left text */
+    .top-left {
+      position: absolute;
+      top: 20rem;
+      left: 20rem;
+      color: #00cd33;
+      font-size: 5rem;
+      text-shadow: 0 0 8px #051806, 0 0 8px #21a525;
+    }
+
+    @media (max-width: 768px) {
+      .top-left {
+        top: 4rem;
+        left: 1rem;
+        font-size: 3rem;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .top-left {
+        top: 4rem;
+        left: 0.5rem;
+        font-size: 5rem;
+      }
+    }
+
+    /* Bottom-right button */
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      z-index: 1000;
+    }
+
+    .clickable-image {
+      border: none;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    @media (max-width: 480px) {
+      .clickable-image {
+        width: 90px;
+      }
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 2rem;
+      color: #00ff37;
+      margin-top: 5px;
+      font-family: 'Geo', sans-serif;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.4; }
+    }
+
+    /* Alert box */
+    .alert-box {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #000000;
+      border: 3px solid rgb(187, 28, 187);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgb(127, 0, 139);
+      z-index: 2000;
+      display: none;
+      text-align: center;
+      color: purple;
+      max-width: 80%;
+      width: 400px;
+    }
+
+    .alert-box p {
+      margin: 0 0 20px 0;
+      font-size: 2rem;
+      line-height: 1.4;
+    }
+
+    .alert-box button {
+      background-color: purple;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-family: 'Courier New Bold', monospace, 'Courier New', Courier;
+      font-size: 1.2rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .alert-box button:hover {
+      background-color: darkmagenta;
+    }
+  </style>
+</head>
+<body>
+  <div class="top-left">Welcome to Algorythmic Meditations
+    <p>Please use charcoal to trace the projection</p>
+  </div>
+
+  <div class="bottom-right">
+      <img src="Artificial Intelligence Hello Sticker.gif" alt="Go Button" class="clickable-image" 
+           onerror="this.onerror=null; this.src='https://placehold.co/150x150/FF69B4/FFFFFF?text=Go!';"/>
+
+  <div id="customAlert" class="alert-box">
+    <p>this work explores the relationship between the body and technology,
+        emphasizing the body's role as an active participant rather than a passive user.<br><br></p>
+    <button id="alertDoneButton">ILLUSION</button>
+  </div>
+
+  <script>
+    window.onload = function() {
+      const alertBox = document.getElementById('customAlert');
+      const alertDoneButton = document.getElementById('alertDoneButton');
+      setTimeout(() => alertBox.style.display = 'block', 1000);
+      alertDoneButton.addEventListener('click', () => alertBox.style.display = 'none');
+    };
+  </script>
+</body>
+</html>
