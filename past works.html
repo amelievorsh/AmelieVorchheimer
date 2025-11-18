@@ -8,262 +8,41 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
   <style>
+    /* [Your CSS styles remain unchanged] */
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Geo', sans-serif;
-      background: #000;
-      color: #ff0000;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-    }
-
-    #backgroundCanvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-    }
-
-    .desktop {
-      position: relative;
-      z-index: 1;
-      height: 100vh;
-      width: 100vw;
-      padding: 20px;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, 120px);
-      grid-gap: 30px;
-      align-content: start;
-      overflow-y: auto;
-    }
-
-    .folder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-
+    body { font-family: 'Geo', sans-serif; background: #000; color: #ff0000; overflow: hidden; height: 100vh; width: 100vw; }
+    #backgroundCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+    .desktop { position: relative; z-index: 1; height: 100vh; width: 100vw; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 120px); grid-gap: 30px; align-content: start; overflow-y: auto; }
+    .folder { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
     .folder:hover { transform: scale(1.1); }
-
-    .folder-icon {
-      width: 80px; height: 80px;
-      background: #ff0000;
-      clip-path: polygon(0% 15%, 40% 15%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
-      box-shadow: 0 0 15px rgba(255,0,0,0.6);
-      margin-bottom: 8px;
-      position: relative;
-    }
-
-    .folder-icon::before {
-      content: '';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      width: 50%; height: 50%;
-      background: #000;
-      clip-path: polygon(20% 30%, 80% 30%, 70% 70%, 30% 70%);
-    }
-
-    .folder-name {
-      color: #ff0000;
-      font-size: 0.95rem;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(255,0,0,0.8);
-      word-wrap: break-word;
-      max-width: 120px;
-    }
-
-    .window {
-      position: fixed;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0,0,0,0.95);
-      border: 3px solid #ff0000;
-      box-shadow: 0 0 30px rgba(255,0,0,0.8);
-      min-width: 600px;
-      max-width: 90vw;
-      max-height: 90vh;
-      display: none;
-      flex-direction: column;
-      z-index: 1000;
-    }
-
+    .folder-icon { width: 80px; height: 80px; background: #ff0000; clip-path: polygon(0% 15%, 40% 15%, 50% 0%, 100% 0%, 100% 100%, 0% 100%); box-shadow: 0 0 15px rgba(255,0,0,0.6); margin-bottom: 8px; position: relative; }
+    .folder-icon::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; background: #000; clip-path: polygon(20% 30%, 80% 30%, 70% 70%, 30% 70%); }
+    .folder-name { color: #ff0000; font-size: 0.95rem; text-align: center; text-shadow: 0 0 5px rgba(255,0,0,0.8); word-wrap: break-word; max-width: 120px; }
+    .window { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 3px solid #ff0000; box-shadow: 0 0 30px rgba(255,0,0,0.8); min-width: 600px; max-width: 90vw; max-height: 90vh; display: none; flex-direction: column; z-index: 1000; }
     .window.active { display: flex; }
-
-    .window-header {
-      background: #ff0000;
-      color: #000;
-      padding: 10px 15px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      cursor: move;
-      user-select: none;
-    }
-
+    .window-header { background: #ff0000; color: #000; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: move; user-select: none; }
     .window-title { font-weight: bold; font-size: 1rem; }
-
-    .close-btn {
-      background: #000; color: #ff0000;
-      border: 2px solid #000;
-      width: 25px; height: 25px;
-      cursor: pointer;
-      font-weight: bold; font-size: 1.2rem;
-      display: flex; align-items: center; justify-content: center;
-      transition: all 0.2s;
-    }
-
-    .close-btn:hover {
-      background: #ff0000; color: #000;
-      border-color: #ff0000;
-    }
-
-    .window-content {
-      padding: 20px;
-      overflow-y: auto;
-      max-height: calc(90vh - 50px);
-      color: #ff0000;
-    }
-
+    .close-btn { background: #000; color: #ff0000; border: 2px solid #000; width: 25px; height: 25px; cursor: pointer; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .close-btn:hover { background: #ff0000; color: #000; border-color: #ff0000; }
+    .window-content { padding: 20px; overflow-y: auto; max-height: calc(90vh - 50px); color: #ff0000; }
     .window-content h2 { margin-bottom: 15px; }
     .window-content p { line-height: 1.6; margin-bottom: 15px; color: #ff4444; font-size: 0.9rem; }
-
-    /* Gallery Styles */
-    .image-gallery {
-      position: relative;
-      margin: 20px 0;
-      background: #1a0000;
-      border: 2px solid #ff0000;
-      overflow: hidden;
-      height: 500px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .gallery-track {
-      display: flex;
-      transition: transform 0.4s ease;
-      height: 100%;
-      align-items: center;
-    }
-
-    .gallery-item {
-      min-width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    .gallery-item img {
-      max-width: 100%;
-      max-height: 100%;
-      object-fit: contain;
-      display: block;
-    }
-
-    .gallery-nav {
-      position: absolute;
-      top: 50%;
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      transform: translateY(-50%);
-      padding: 0 10px;
-      pointer-events: none;
-      z-index: 10;
-    }
-
-    .gallery-nav button {
-      background: rgba(255,0,0,0.7);
-      border: none;
-      color: #000;
-      font-size: 2rem;
-      cursor: pointer;
-      pointer-events: auto;
-      padding: 10px 15px;
-      transition: all 0.2s;
-      font-weight: bold;
-      line-height: 1;
-    }
-
-    .gallery-nav button:hover { 
-      background: rgba(255,0,0,1);
-      transform: scale(1.1);
-    }
-
-    .gallery-nav button:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-    }
-
-    .gallery-counter {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255,0,0,0.8);
-      color: #000;
-      padding: 5px 15px;
-      font-size: 0.9rem;
-      font-weight: bold;
-      z-index: 10;
-    }
-
-    /* Video Container */
-    .video-container {
-      margin: 20px 0;
-      background: #1a0000;
-      border: 2px solid #ff0000;
-      padding: 10px;
-    }
-
-    .video-container video {
-      width: 100%;
-      max-height: 500px;
-      display: block;
-    }
-
-    .links {
-      margin-top: 20px;
-    }
-
-    .links a {
-      display: block;
-      color: #ff0000;
-      text-decoration: none;
-      padding: 8px 0;
-      transition: all 0.2s;
-    }
-
-    .links a:hover {
-      color: #ff4444;
-      text-shadow: 0 0 10px rgba(255,0,0,0.8);
-      padding-left: 10px;
-    }
-
-    .home-btn {
-      position: fixed; bottom: 20px; right: 20px;
-      background: #ff0000; color: #000;
-      border: none; padding: 12px 24px;
-      font-family: 'Geo', sans-serif;
-      font-size: 1rem; cursor: pointer;
-      box-shadow: 0 0 15px rgba(255,0,0,0.6);
-      transition: all 0.3s;
-      z-index: 999;
-    }
-
-    .home-btn:hover {
-      background: #cc0000;
-      box-shadow: 0 0 25px rgba(255,0,0,0.9);
-    }
-
+    .image-gallery { position: relative; margin: 20px 0; background: #1a0000; border: 2px solid #ff0000; overflow: hidden; height: 500px; display: flex; align-items: center; justify-content: center; }
+    .gallery-track { display: flex; transition: transform 0.4s ease; height: 100%; align-items: center; }
+    .gallery-item { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .gallery-item img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
+    .gallery-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 10px; pointer-events: none; z-index: 10; }
+    .gallery-nav button { background: rgba(255,0,0,0.7); border: none; color: #000; font-size: 2rem; cursor: pointer; pointer-events: auto; padding: 10px 15px; transition: all 0.2s; font-weight: bold; line-height: 1; }
+    .gallery-nav button:hover { background: rgba(255,0,0,1); transform: scale(1.1); }
+    .gallery-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
+    .gallery-counter { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,0,0,0.8); color: #000; padding: 5px 15px; font-size: 0.9rem; font-weight: bold; z-index: 10; }
+    .video-container { margin: 20px 0; background: #1a0000; border: 2px solid #ff0000; padding: 10px; }
+    .video-container video { width: 100%; max-height: 500px; display: block; }
+    .links { margin-top: 20px; }
+    .links a { display: block; color: #ff0000; text-decoration: none; padding: 8px 0; transition: all 0.2s; }
+    .links a:hover { color: #ff4444; text-shadow: 0 0 10px rgba(255,0,0,0.8); padding-left: 10px; }
+    .home-btn { position: fixed; bottom: 20px; right: 20px; background: #ff0000; color: #000; border: none; padding: 12px 24px; font-family: 'Geo', sans-serif; font-size: 1rem; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.6); transition: all 0.3s; z-index: 999; }
+    .home-btn:hover { background: #cc0000; box-shadow: 0 0 25px rgba(255,0,0,0.9); }
     @media (max-width: 768px) {
       .desktop { grid-template-columns: repeat(auto-fill, 100px); grid-gap: 20px; padding: 15px; }
       .folder-icon { width: 60px; height: 60px; }
@@ -402,12 +181,13 @@
     </div>
     <div class="window-content">
       <h2>From Glen Waverly</h2>
+      
       <div class="video-container">
         <video controls>
           <source src="train.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
-        </div>
+      </div>
       <div class="image-gallery" data-gallery="work4">
         <div class="gallery-track">
           <div class="gallery-item"><img src="train2.png" alt="From Glen Waverly - Image 1"></div>
@@ -437,7 +217,6 @@
           <div class="gallery-item"><img src="fragment2.jpeg" alt="A fragment - Image 2"></div>
           <div class="gallery-item"><img src="fragment3.jpeg" alt="A fragment - Image 3"></div>
           <div class="gallery-item"><img src="fragment4.jpeg" alt="A fragment - Image 4"></div>
-
         </div>
         <div class="gallery-nav">
           <button class="prev" onclick="changeSlide('work5', -1)">&#10094;</button>
@@ -504,14 +283,15 @@
     </div>
     <div class="window-content">
       <h2>Cheap Solutions 2025</h2>
+      
       <div class="video-container">
         <video controls style="width:400px;height:400px;">
           <source src="nature_1.mp4" type="video/mp4">
           Your browser does not support the video tag.
         </video>
-        </div>
+      </div>
       <p>When the environment fails to regrow, where does that leave us?</p>
-      <p>Donna Haraway argues "the cyborg as a fiction mapping our social and bodily reality", suggesting that due to our reliance and compliance with technological realities, we have become cyborgian creatures. This consumer culture, existing to numb us, removes us from the reality that is the acceleration of the destruction of Earth. Online, the information we consume has the potential to teach us, whether real or false information. Drawing on a culture built on information economies, this work questions you.</p>
+      <p>Donna Haraway argues "the cyborg as a fiction mapping our social and bodily reality", suggesting that due to our reliance and compliance with technological realities, we have become cyborgian creatures. This consumer culture, existing to numb us, removes us from perpetrator reality that is the acceleration of the destruction of Earth. Online, the information we consume has the potential to teach us, whether real or false information. Drawing on a culture built on information economies, this work questions you.</p>
       <p>What do you do with the information provided to you?</p>
       <p>How do you reclaim autonomy from machines that exist to spread misinformation?</p>
       <p>Images document the work exhibited as part of Decay, 2025.</p>
@@ -531,7 +311,6 @@
           <div class="gallery-item"><img src="lillah2.png" alt="Untitled Collab - Image 2"></div>
           <div class="gallery-item"><img src="Lillah2.jpeg" alt="Untitled Collab - Image 3"></div>
           <div class="gallery-item"><img src="lilah3.jpeg" alt="Untitled Collab - Image 3"></div>
-
         </div>
         <div class="gallery-nav">
           <button class="prev" onclick="changeSlide('work9', -1)">&#10094;</button>
@@ -557,7 +336,6 @@
           <div class="gallery-item"><img src="coding1.png" alt="P5.js Projects - Image 2"></div>
           <div class="gallery-item"><img src="coding2.png" alt="P5.js Projects - Image 3"></div>
           <div class="gallery-item"><img src="coding3.png" alt="P5.js Projects - Image 4"></div>
-
         </div>
         <div class="gallery-nav">
           <button class="prev" onclick="changeSlide('work10', -1)">&#10094;</button>
@@ -597,8 +375,6 @@
           <div class="gallery-item"><img src="photog5.jpeg" alt="Photography - Image 6"></div>
           <div class="gallery-item"><img src="photog7.jpeg" alt="Photography - Image 7"></div>
           <div class="gallery-item"><img src="photog8.jpeg" alt="Photography - Image 8"></div>
-          
-          
         </div>
         <div class="gallery-nav">
           <button class="prev" onclick="changeSlide('work11', -1)">&#10094;</button>
@@ -725,6 +501,7 @@
     }
 
     // Interactive Background Canvas
+    // Interactive Background Canvas
     const canvas = document.getElementById('backgroundCanvas');
     const ctx = canvas.getContext('2d');
     
@@ -736,8 +513,183 @@
     let particles = [];
     
     class Particle {
-      // ... (rest of the script) ...
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.size = Math.random() * 3 + 1;
+        this.speedX = Math.random() * 3 - 1.5;
+        this.speedY = Math.random() * 3 - 1.5;
+        this.life = 100;
+      }
+      
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        
+        const dx = mouseX - this.x;
+        const dy = mouseY - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 100) {
+          const force = (100 - distance) / 100;
+          this.x -= (dx / distance) * force * 2;
+          this.y -= (dy / distance) * force * 2;
+        }
+        
+        this.life -= 0.5;
+      }
+      
+      draw() {
+        ctx.fillStyle = `rgba(255, 0, 0, ${this.life / 100})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = `rgba(255, 0, 0, ${this.life / 200})`;
+        ctx.lineWidth = 0.5;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.stroke();
+      }
     }
+    
+    function animate() {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      if (Math.random() < 0.3) {
+        particles.push(new Particle(
+          Math.random() * canvas.width,
+          Math.random() * canvas.height
+        ));
+      }
+      
+      for (let i = particles.length - 1; i >= 0; i--) {
+        particles[i].update();
+        particles[i].draw();
+        
+        if (particles[i].life <= 0) {
+          particles.splice(i, 1);
+        }
+      }
+      
+      // Draw connections between nearby particles
+      for (let i = 0; i < particles.length; i++) {
+        for (let j = i + 1; j < particles.length; j++) {
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (distance < 80) {
+            ctx.strokeStyle = `rgba(255, 0, 0, ${(1 - distance / 80) * 0.2})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.moveTo(particles[i].x, particles[i].y);
+            ctx.lineTo(particles[j].x, particles[j].y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      // Draw glow around mouse
+      const gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, 100);
+      gradient.addColorStop(0, 'rgba(255, 0, 0, 0.1)');
+      gradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+      requestAnimationFrame(animate);
+    }
+    
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      // Create particles at mouse position
+      if (Math.random() < 0.5) {
+        particles.push(new Particle(mouseX, mouseY));
+      }
+    });
+    
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+    
+    animate();
+
+    // Folder and Window Management
+    const folders = document.querySelectorAll('.folder');
+    const windows = document.querySelectorAll('.window');
+
+    folders.forEach(folder => {
+      folder.addEventListener('click', () => {
+        const workId = folder.getAttribute('data-work');
+        openWindow(workId);
+      });
+    });
+
+    function openWindow(workId) {
+      const window = document.getElementById(workId);
+      window.classList.add('active');
+      
+      // Reset gallery to first image when opening
+      if (galleries[workId]) {
+        galleries[workId].currentIndex = 0;
+        updateGallery(workId);
+      }
+    }
+
+    function closeWindow(workId) {
+      const window = document.getElementById(workId);
+      window.classList.remove('active');
+    }
+
+    // Draggable windows
+    windows.forEach(win => {
+      const header = win.querySelector('.window-header');
+      let isDragging = false;
+      let currentX;
+      let currentY;
+      let initialX;
+      let initialY;
+      let xOffset = 0;
+      let yOffset = 0;
+
+      header.addEventListener('mousedown', dragStart);
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('mouseup', dragEnd);
+
+      function dragStart(e) {
+        if (e.target.classList.contains('close-btn')) return;
+        initialX = e.clientX - xOffset;
+        initialY = e.clientY - yOffset;
+        if (e.target === header || e.target.classList.contains('window-title')) {
+          isDragging = true;
+        }
+      }
+
+      function drag(e) {
+        if (isDragging) {
+          e.preventDefault();
+          currentX = e.clientX - initialX;
+          currentY = e.clientY - initialY;
+          xOffset = currentX;
+          yOffset = currentY;
+          setTranslate(currentX, currentY, win);
+        }
+      }
+
+      function dragEnd(e) {
+        initialX = currentX;
+        initialY = currentY;
+        isDragging = false;
+      }
+
+      function setTranslate(xPos, yPos, el) {
+        el.style.transform = `translate(calc(-50% + ${xPos}px), calc(-50% + ${yPos}px))`;
+      }
+    });
   </script>
 </body>
 </html>
