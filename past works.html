@@ -8,48 +8,263 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
   <style>
-    /* [Your CSS styles remain unchanged] */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Geo', sans-serif; background: #000; color: #ff0000; overflow: hidden; height: 100vh; width: 100vw; }
-    #backgroundCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    .desktop { position: relative; z-index: 1; height: 100vh; width: 100vw; padding: 20px; display: grid; grid-template-columns: repeat(auto-fill, 120px); grid-gap: 30px; align-content: start; overflow-y: auto; }
-    .folder { display: flex; flex-direction: column; align-items: center; cursor: pointer; transition: transform 0.2s; }
-    .folder:hover { transform: scale(1.1); }
-    .folder-icon { width: 80px; height: 80px; background: #ff0000; clip-path: polygon(0% 15%, 40% 15%, 50% 0%, 100% 0%, 100% 100%, 0% 100%); box-shadow: 0 0 15px rgba(255,0,0,0.6); margin-bottom: 8px; position: relative; }
-    .folder-icon::before { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; background: #000; clip-path: polygon(20% 30%, 80% 30%, 70% 70%, 30% 70%); }
-    .folder-name { color: #ff0000; font-size: 0.95rem; text-align: center; text-shadow: 0 0 5px rgba(255,0,0,0.8); word-wrap: break-word; max-width: 120px; }
-    .window { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); border: 3px solid #ff0000; box-shadow: 0 0 30px rgba(255,0,0,0.8); min-width: 600px; max-width: 90vw; max-height: 90vh; display: none; flex-direction: column; z-index: 1000; }
-    .window.active { display: flex; }
-    .window-header { background: #ff0000; color: #000; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; cursor: move; user-select: none; }
-    .window-title { font-weight: bold; font-size: 1rem; }
-    .close-btn { background: #000; color: #ff0000; border: 2px solid #000; width: 25px; height: 25px; cursor: pointer; font-weight: bold; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-    .close-btn:hover { background: #ff0000; color: #000; border-color: #ff0000; }
-    .window-content { padding: 20px; overflow-y: auto; max-height: calc(90vh - 50px); color: #ff0000; }
-    .window-content h2 { margin-bottom: 15px; }
-    .window-content p { line-height: 1.6; margin-bottom: 15px; color: #ff4444; font-size: 0.9rem; }
-    .image-gallery { position: relative; margin: 20px 0; background: #1a0000; border: 2px solid #ff0000; overflow: hidden; height: 500px; display: flex; align-items: center; justify-content: center; }
-    .gallery-track { display: flex; transition: transform 0.4s ease; height: 100%; align-items: center; }
-    .gallery-item { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .gallery-item img { max-width: 100%; max-height: 100%; object-fit: contain; display: block; }
-    .gallery-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 10px; pointer-events: none; z-index: 10; }
-    .gallery-nav button { background: rgba(255,0,0,0.7); border: none; color: #000; font-size: 2rem; cursor: pointer; pointer-events: auto; padding: 10px 15px; transition: all 0.2s; font-weight: bold; line-height: 1; }
-    .gallery-nav button:hover { background: rgba(255,0,0,1); transform: scale(1.1); }
-    .gallery-nav button:disabled { opacity: 0.3; cursor: not-allowed; }
-    .gallery-counter { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(255,0,0,0.8); color: #000; padding: 5px 15px; font-size: 0.9rem; font-weight: bold; z-index: 10; }
-    .video-container { margin: 20px 0; background: #1a0000; border: 2px solid #ff0000; padding: 10px; }
-    .video-container video { width: 100%; max-height: 500px; display: block; }
-    .links { margin-top: 20px; }
-    .links a { display: block; color: #ff0000; text-decoration: none; padding: 8px 0; transition: all 0.2s; }
-    .links a:hover { color: #ff4444; text-shadow: 0 0 10px rgba(255,0,0,0.8); padding-left: 10px; }
-    .home-btn { position: fixed; bottom: 20px; right: 20px; background: #ff0000; color: #000; border: none; padding: 12px 24px; font-family: 'Geo', sans-serif; font-size: 1rem; cursor: pointer; box-shadow: 0 0 15px rgba(255,0,0,0.6); transition: all 0.3s; z-index: 999; }
-    .home-btn:hover { background: #cc0000; box-shadow: 0 0 25px rgba(255,0,0,0.9); }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Geo', sans-serif;
+      background: #000000;
+      color: #ff0000;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+    }
+
+    #backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    .desktop {
+      position: relative;
+      z-index: 1;
+      height: 100vh;
+      width: 100vw;
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 120px);
+      grid-gap: 30px;
+      align-content: start;
+      overflow-y: auto;
+    }
+
+    .folder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .folder:hover {
+      transform: scale(1.1);
+    }
+
+    .folder-icon {
+      width: 80px;
+      height: 80px;
+      background: #ff0000;
+      clip-path: polygon(0% 15%, 40% 15%, 50% 0%, 100% 0%, 100% 100%, 0% 100%);
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .folder-icon::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      height: 50%;
+      background: #000000;
+      clip-path: polygon(20% 30%, 80% 30%, 70% 70%, 30% 70%);
+    }
+
+    .folder-name {
+      color: #ff0000;
+      font-size: 0.95rem;
+      text-align: center;
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.8);
+      word-wrap: break-word;
+      max-width: 120px;
+    }
+
+    .window {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      border: 3px solid #ff0000;
+      box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
+      min-width: 600px;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: none;
+      flex-direction: column;
+      z-index: 1000;
+    }
+
+    .window.active {
+      display: flex;
+    }
+
+    .window-header {
+      background: #ff0000;
+      color: #000000;
+      padding: 10px 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: move;
+      user-select: none;
+    }
+
+    .window-title {
+      font-weight: bold;
+      font-size: 1rem;
+    }
+
+    .close-btn {
+      background: #000000;
+      color: #ff0000;
+      border: 2px solid #000000;
+      width: 25px;
+      height: 25px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .close-btn:hover {
+      background: #ff0000;
+      color: #000000;
+      border-color: #ff0000;
+    }
+
+    .window-content {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(90vh - 50px);
+      color: #ff0000;
+    }
+
+    .window-content h2 {
+      color: #ff0000;
+      margin-bottom: 15px;
+      text-shadow: 0 0 5px rgba(255, 0, 0, 0.6);
+    }
+
+    .window-content p {
+      line-height: 1.6;
+      margin-bottom: 15px;
+      color: #ff4444;
+      font-size: 0.9rem;
+    }
+
+    .image-gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .gallery-item {
+      width: 100%;
+      height: 450px;
+      background: #1a0000;
+      border: 2px solid #ff0000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ff0000;
+      font-size: 0.8rem;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .video-container {
+      margin: 20px 0;
+      border: 2px solid #ff0000;
+      background: #1a0000;
+    }
+
+    .video-container video {
+      width: 100%;
+      height: auto;
+    }
+
+    .links {
+      margin: 15px 0;
+    }
+
+    .links a {
+      color: #ff0000;
+      text-decoration: none;
+      display: block;
+      margin: 5px 0;
+      transition: text-shadow 0.2s;
+    }
+
+    .links a:hover {
+      text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+    }
+
+    .home-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #ff0000;
+      color: #000000;
+      border: none;
+      padding: 12px 24px;
+      font-family: 'Geo', sans-serif;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(255, 0, 0, 0.6);
+      transition: all 0.3s;
+      z-index: 999;
+    }
+
+    .home-btn:hover {
+      background: #cc0000;
+      box-shadow: 0 0 25px rgba(255, 0, 0, 0.9);
+    }
+
     @media (max-width: 768px) {
-      .desktop { grid-template-columns: repeat(auto-fill, 100px); grid-gap: 20px; padding: 15px; }
-      .folder-icon { width: 60px; height: 60px; }
-      .window { min-width: 95vw; max-width: 95vw; }
-      .window-content { padding: 15px; }
-      .image-gallery { height: 300px; }
-      .gallery-nav button { font-size: 1.5rem; padding: 5px 10px; }
+      .desktop {
+        grid-template-columns: repeat(auto-fill, 100px);
+        grid-gap: 20px;
+        padding: 15px;
+      }
+
+      .folder-icon {
+        width: 60px;
+        height: 60px;
+      }
+
+      .window {
+        min-width: 95vw;
+        max-width: 95vw;
+      }
+
+      .window-content {
+        padding: 15px;
+      }
+
+      .image-gallery {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
@@ -107,6 +322,7 @@
     </div>
   </div>
 
+  <!-- Work 1 Window -->
   <div class="window" id="work1">
     <div class="window-header">
       <span class="window-title">What it it that it is</span>
@@ -114,23 +330,17 @@
     </div>
     <div class="window-content">
       <h2>What it it that it is</h2>
-      <div class="image-gallery" data-gallery="work1">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="what is it1.jpeg" alt="Image 1"></div>
-          <div class="gallery-item"><img src="what is it 2.jpeg" alt="Image 2"></div>
-          <div class="gallery-item"><img src="what is it 3.jpeg" alt="What it is that it is - Image 3"></div>
-          <div class="gallery-item"><img src="what is it4.jpeg" alt="What it is that it is - Image 4"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work1', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work1', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">4</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="what is it1.jpeg" alt="What it is that it is - Image 1"></div>
+        <div class="gallery-item"><img src="what is it 2.jpeg" alt="What it is that it is - Image 2"></div>
+        <div class="gallery-item"><img src="what is it 3.jpeg" alt="What it is that it is - Image 3"></div>
+        <div class="gallery-item"><img src="what is it4.jpeg" alt="What it is that it is - Image 4"></div>
       </div>
       <p>What is it that is was a multi phase social constructivism project that explored cognitive development techniques in response to neurodeterioration as a result of the attention economy. It was positioned as a research project, that aimed to create community adhesion. There were 5 main iterations, Professional business meeting, Happening #1, What is it that it is, Mediated Brainstorm and A fragment. Each was conducted in a different location with a different group of people. The intention was to connect people from different demographic through different means of communication such as drawing, prompt cards, music and interactive work. This project is ongoing throughout my practice as I seek to unpack the impacts of vocabulary and social skill loss as a result of internet use.</p>
     </div>
   </div>
 
+  <!-- Work 2 Window -->
   <div class="window" id="work2">
     <div class="window-header">
       <span class="window-title">Visualised Screaming, 2024</span>
@@ -138,20 +348,14 @@
     </div>
     <div class="window-content">
       <h2>Visualised Screaming, 2024</h2>
-      <div class="image-gallery" data-gallery="work2">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="visualised screaming.jpeg" alt="Visualised Screaming - Image 1"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work2', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work2', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">1</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="visualised screaming.jpeg" alt="Visualised Screaming - Image 1"></div>
       </div>
       <p>Visualised Screaming emerged from the data and recordings collected in What is it that it is. Using a spectrum analyser, I translated spoken audio from the discussions into visual forms. This transformation critiqued algorithmic systems that continuously analyse human behaviour for consumption. By creating a "redundant" form of analysis, the work questions how digital systems absorb and commodify emotion. Images show work presented in a range of spaces inc. miscellania melbourne.</p>
     </div>
   </div>
 
+  <!-- Work 3 Window -->
   <div class="window" id="work3">
     <div class="window-header">
       <span class="window-title">I have Detained your attention, 2025</span>
@@ -159,21 +363,15 @@
     </div>
     <div class="window-content">
       <h2>I have Detained your attention, 2025</h2>
-      <div class="image-gallery" data-gallery="work3">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="algorythmicmeditations.jpeg" alt="I have Detained your attention - Image 1"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work3', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work3', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">1</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="algorythmicmeditations.jpeg" alt="I have Detained your attention - Image 1"></div>
       </div>
       <p>This ongoing project extends my investigation into human–machine dynamics. Presented as an immersive installation, it combines sound, interactive media, floor decals, and a website to question surveillance and autonomy. Within this environment, the machine assumes control, dictating how audiences move and listen. The installation draws on social constructivism, liminality, and intersectional feminist theory to consider how data and behaviour intersect in algorithmic spaces.</p>
       <p>Part of the work includes Algorithmic Meditations, a code-based sound generator where code itself performs agency. The audience becomes the instrument, translating generative audio into physical gestures.</p>
     </div>
   </div>
 
+  <!-- Work 4 Window -->
   <div class="window" id="work4">
     <div class="window-header">
       <span class="window-title">From Glen Waverly</span>
@@ -181,25 +379,18 @@
     </div>
     <div class="window-content">
       <h2>From Glen Waverly</h2>
-      
       <div class="video-container">
       </div>
-      <div class="image-gallery" data-gallery="work4">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="train2.png" alt="From Glen Waverly - Image 1"></div>
-          <div class="gallery-item"><img src="train3.png" alt="From Glen Waverly - Image 2"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work4', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work4', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">2</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="train2.png" alt="From Glen Waverly - Image 1"></div>
+        <div class="gallery-item"><img src="train3.png" alt="From Glen Waverly - Image 2"></div>
       </div>
       <p>These are a series of videos that are made from phone recordings out the window of a train. I attempted to induce a feeling of anxiety and dissociation. These feelings are often associated with my personal experience of disengagement with an experience as dictated by digital worlds. I started using the method of "encryption". The purpose of applying it to this practice is to mirror the experience of complete loss of context and understanding that comes with dissociation through technology.</p>
       <p>This work has been displayed as Part of the RMIT IDAHOBIT Exhibition 2025, Fozza Presents 2025, Cross Pollination 2025, and POP POP, 2025.</p>
     </div>
   </div>
 
+  <!-- Work 5 Window -->
   <div class="window" id="work5">
     <div class="window-header">
       <span class="window-title">A fragment, 2024</span>
@@ -207,23 +398,16 @@
     </div>
     <div class="window-content">
       <h2>A fragment, 2024</h2>
-      <div class="image-gallery" data-gallery="work5">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="fragment.jpeg" alt="A fragment - Image 1"></div>
-          <div class="gallery-item"><img src="fragment2.jpeg" alt="A fragment - Image 2"></div>
-          <div class="gallery-item"><img src="fragment3.jpeg" alt="A fragment - Image 3"></div>
-          <div class="gallery-item"><img src="fragment4.jpeg" alt="A fragment - Image 4"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work5', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work5', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">3</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="fragment.jpeg" alt="A fragment - Image 1"></div>
+        <div class="gallery-item"><img src="fragment2.jpeg" alt="A fragment - Image 2"></div>
+        <div class="gallery-item"><img src="fragment3.jpeg" alt="A fragment - Image 3"></div>
       </div>
       <p>A fragment, 2024, was an art exhibition and music event curated in collaboration with Hannah Ogawa. Our intention was to create a site of refusal that sat within the "third space" as a means of rebuilding predefined structures through refusal. The event featured 14 artists and 5 DJs, with a mixture of digital and physical installation works, and an iteration of What is it that it is (2024). Images show installation.</p>
     </div>
   </div>
 
+  <!-- Work 6 Window -->
   <div class="window" id="work6">
     <div class="window-header">
       <span class="window-title">C.me 2025</span>
@@ -231,22 +415,15 @@
     </div>
     <div class="window-content">
       <h2>C.me 2025</h2>
-      <div class="image-gallery" data-gallery="work6">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="c me.png" alt="C.me - Image 1"></div>
-          <div class="gallery-item"><img src="c me1.jpg" alt="C.me - Image 2"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work6', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work6', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">1</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="c me.png" alt="C.me - Image 1"></div>
       </div>
       <p>A fragment, 2024, was an art exhibition and music event curated in collaboration with Hannah Ogawa. Our intention was to create a site of refusal that sat within the "third space" as a means of rebuilding predefined structures through refusal. The event featured 14 artists and 5 DJs, with a mixture of digital and physical installation works, and an iteration of What is it that it is (2024).</p>
       <p>Images show stills of the work. c.me 2025 was shortlisted for the Counihan gallery summer show 2025.</p>
     </div>
   </div>
 
+  <!-- Work 7 Window -->
   <div class="window" id="work7">
     <div class="window-header">
       <span class="window-title">Watching the watcher 2025</span>
@@ -254,17 +431,9 @@
     </div>
     <div class="window-content">
       <h2>Watching the watcher 2025</h2>
-      <div class="image-gallery" data-gallery="work7">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="watching.png" alt="Watching the watcher - Image 1"></div>
-          <div class="gallery-item"><img src="watching2.png" alt="Watching the watcher - Image 2"></div>
-          <div class="gallery-item"><img src="watching the watcher2.jpg" alt="Watching the watcher - Image 3"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work7', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work7', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">2</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="watching.png" alt="Watching the watcher - Image 1"></div>
+        <div class="gallery-item"><img src="watching2.png" alt="Watching the watcher - Image 2"></div>
       </div>
       <p>In response to my iterative project last year, What is it that it is (2024 - ongoing), which explored methods for engaging participants in critical discourse and community building, I created a work that explored the underlying themes that inspired the work. Data mining and attention capitalism dictates the spaces we use online, harvesting our time and attention through systems of analysis that were developed to form algorithms. I created my own system of analysis using the recordings from my previous project, by placing them through phase analysis and then attempting to trace this image in real time. To create the sound that was analysed, I layered them over themselves until they were unable to be heard, thus 'encrypting' the information so that only I knew it's true meaning. The work addresses surveillance of information online and how we are constantly survielled even when we feel we are surveilling.</p>
       <p>The work places the audience in a position of analyser, whilst inhibiting them from understanding the contexts of the content. This aims to be a replication of the way that information is communicated online.</p>
@@ -272,6 +441,7 @@
     </div>
   </div>
 
+  <!-- Work 8 Window -->
   <div class="window" id="work8">
     <div class="window-header">
       <span class="window-title">Cheap Solutions 2025</span>
@@ -279,19 +449,15 @@
     </div>
     <div class="window-content">
       <h2>Cheap Solutions 2025</h2>
-      
-     <div class="image-gallery" data-gallery="work7">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="Cheap.png" alt="Cheap Solutions - Image 1"></div>
-        </div>
       <p>When the environment fails to regrow, where does that leave us?</p>
-      <p>Donna Haraway argues "the cyborg as a fiction mapping our social and bodily reality", suggesting that due to our reliance and compliance with technological realities, we have become cyborgian creatures. This consumer culture, existing to numb us, removes us from perpetrator reality that is the acceleration of the destruction of Earth. Online, the information we consume has the potential to teach us, whether real or false information. Drawing on a culture built on information economies, this work questions you.</p>
+      <p>Donna Haraway argues "the cyborg as a fiction mapping our social and bodily reality", suggesting that due to our reliance and compliance with technological realities, we have become cyborgian creatures. This consumer culture, existing to numb us, removes us from the reality that is the acceleration of the destruction of Earth. Online, the information we consume has the potential to teach us, whether real or false information. Drawing on a culture built on information economies, this work questions you.</p>
       <p>What do you do with the information provided to you?</p>
       <p>How do you reclaim autonomy from machines that exist to spread misinformation?</p>
       <p>Images document the work exhibited as part of Decay, 2025.</p>
     </div>
   </div>
 
+  <!-- Work 9 Window -->
   <div class="window" id="work9">
     <div class="window-header">
       <span class="window-title">Untitled Collab with Lillah S-D</span>
@@ -299,24 +465,16 @@
     </div>
     <div class="window-content">
       <h2>Untitled Collab with Lillah S-D</h2>
-      <div class="image-gallery" data-gallery="work9">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="lillah.jpeg" alt="Untitled Collab - Image 1"></div>
-          <div class="gallery-item"><img src="lillah2.png" alt="Untitled Collab - Image 2"></div>
-          <div class="gallery-item"><img src="Lillah2.jpeg" alt="Untitled Collab - Image 3"></div>
-          <div class="gallery-item"><img src="lilah3.jpeg" alt="Untitled Collab - Image 3"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work9', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work9', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">2</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="lillah.jpeg" alt="Untitled Collab - Image 1"></div>
+        <div class="gallery-item"><img src="lillah2.png" alt="Untitled Collab - Image 2"></div>
       </div>
       <p>In collaboration with Lillah Summers Dixon, I created Silenced, and Unitled. These works explored the role of men in the public eye, and how these spaces are dominated by upper class, "professionals". Our work explored drag as a form of expression, as we created a subversive replication of a sports commentary wering drag. We also documented an adventure through brunswick in drag, exploring the concept of masculinity and societal expectations of presentation.</p>
       <p>These works were exhibited in Pride Pallette IDAHOBIT exhibition 2024 & 2025 & The RMIT Gradute Exhibtion 2024</p>
     </div>
   </div>
 
+  <!-- Work 10 Window -->
   <div class="window" id="work10">
     <div class="window-header">
       <span class="window-title">P5.js Projects</span>
@@ -324,18 +482,8 @@
     </div>
     <div class="window-content">
       <h2>P5.js Projects</h2>
-      <div class="image-gallery" data-gallery="work10">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="coding.png" alt="P5.js Projects - Image 1"></div>
-          <div class="gallery-item"><img src="coding1.png" alt="P5.js Projects - Image 2"></div>
-          <div class="gallery-item"><img src="coding2.png" alt="P5.js Projects - Image 3"></div>
-          <div class="gallery-item"><img src="coding3.png" alt="P5.js Projects - Image 4"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work10', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work10', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">1</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="coding.png" alt="P5.js Projects - Image 1"></div>
       </div>
       <p>A large portion of my work explores digital interactive media.</p>
       <p>A key work is Omission of self awareness, displayed at RMIT open day 2025</p>
@@ -352,6 +500,7 @@
     </div>
   </div>
 
+  <!-- Work 11 Window -->
   <div class="window" id="work11">
     <div class="window-header">
       <span class="window-title">Photography</span>
@@ -359,27 +508,17 @@
     </div>
     <div class="window-content">
       <h2>Photography</h2>
-      <div class="image-gallery" data-gallery="work11">
-        <div class="gallery-track">
-          <div class="gallery-item"><img src="photog1.jpeg" alt="Photography - Image 1"></div>
-          <div class="gallery-item"><img src="photog2.jpeg" alt="Photography - Image 2"></div>
-          <div class="gallery-item"><img src="photog3.jpeg" alt="Photography - Image 3"></div>
-          <div class="gallery-item"><img src="photog4.jpeg" alt="Photography - Image 4"></div>
-          <div class="gallery-item"><img src="photog6.jpeg" alt="Photography - Image 5"></div>
-          <div class="gallery-item"><img src="photog5.jpeg" alt="Photography - Image 6"></div>
-          <div class="gallery-item"><img src="photog7.jpeg" alt="Photography - Image 7"></div>
-          <div class="gallery-item"><img src="photog8.jpeg" alt="Photography - Image 8"></div>
-        </div>
-        <div class="gallery-nav">
-          <button class="prev" onclick="changeSlide('work11', -1)">&#10094;</button>
-          <button class="next" onclick="changeSlide('work11', 1)">&#10095;</button>
-        </div>
-        <div class="gallery-counter"><span class="current">1</span> / <span class="total">4</span></div>
+      <div class="image-gallery">
+        <div class="gallery-item"><img src="photog1.jpeg" alt="Photography - Image 1"></div>
+        <div class="gallery-item"><img src="photog2.jpeg" alt="Photography - Image 2"></div>
+        <div class="gallery-item"><img src="photog3.jpeg" alt="Photography - Image 3"></div>
+        <div class="gallery-item"><img src="photog4.jpeg" alt="Photography - Image 4"></div>
       </div>
       <p>Photography is the backbone of my practice. I have been a photographer since 2020 with a keen interest in capturing moments that seem unimportant. My photography practice privileges interpersonal and personal moments of expression, rather than documentation or experimentation. I use photography as a medium for exploring private and public recollection of experience.</p>
     </div>
   </div>
 
+  <!-- Work 12 Window -->
   <div class="window" id="work12">
     <div class="window-header">
       <span class="window-title">Design</span>
@@ -397,104 +536,6 @@
   <button class="home-btn" onclick="window.location.href='Index page 1.html'">HOME</button>
 
   <script>
-    // Gallery functionality
-    const galleries = {};
-
-    // Initialize all galleries
-    document.querySelectorAll('.image-gallery').forEach(gallery => {
-      const galleryId = gallery.getAttribute('data-gallery');
-      const items = gallery.querySelectorAll('.gallery-item');
-      const totalSpan = gallery.querySelector('.total');
-      
-      galleries[galleryId] = {
-        currentIndex: 0,
-        totalItems: items.length,
-        track: gallery.querySelector('.gallery-track'),
-        counter: gallery.querySelector('.gallery-counter'),
-        prevBtn: gallery.querySelector('.prev'),
-        nextBtn: gallery.querySelector('.next')
-      };
-      
-      if (totalSpan) {
-        totalSpan.textContent = items.length;
-      }
-      
-      updateGallery(galleryId);
-    });
-
-    function changeSlide(galleryId, direction) {
-      const gallery = galleries[galleryId];
-      gallery.currentIndex += direction;
-      
-      // Loop around
-      if (gallery.currentIndex < 0) {
-        gallery.currentIndex = gallery.totalItems - 1;
-      } else if (gallery.currentIndex >= gallery.totalItems) {
-        gallery.currentIndex = 0;
-      }
-      
-      updateGallery(galleryId);
-    }
-
-    function updateGallery(galleryId) {
-      const gallery = galleries[galleryId];
-      const offset = -gallery.currentIndex * 100;
-      gallery.track.style.transform = `translateX(${offset}%)`;
-      
-      const currentSpan = gallery.counter.querySelector('.current');
-      if (currentSpan) {
-        currentSpan.textContent = gallery.currentIndex + 1;
-      }
-      
-      // Update button states
-      gallery.prevBtn.disabled = false;
-      gallery.nextBtn.disabled = false;
-    }
-
-    // Add keyboard navigation
-    document.addEventListener('keydown', (e) => {
-      const activeWindow = document.querySelector('.window.active');
-      if (!activeWindow) return;
-      
-      const galleryId = activeWindow.querySelector('.image-gallery')?.getAttribute('data-gallery');
-      if (!galleryId) return;
-      
-      if (e.key === 'ArrowLeft') {
-        changeSlide(galleryId, -1);
-      } else if (e.key === 'ArrowRight') {
-        changeSlide(galleryId, 1);
-      }
-    });
-
-    // Touch/swipe support for mobile
-    let touchStartX = 0;
-    let touchEndX = 0;
-
-    document.querySelectorAll('.image-gallery').forEach(gallery => {
-      gallery.addEventListener('touchstart', e => {
-        touchStartX = e.changedTouches[0].screenX;
-      });
-
-      gallery.addEventListener('touchend', e => {
-        touchEndX = e.changedTouches[0].screenX;
-        handleSwipe(gallery);
-      });
-    });
-
-    function handleSwipe(gallery) {
-      const galleryId = gallery.getAttribute('data-gallery');
-      const swipeThreshold = 50;
-      
-      if (touchEndX < touchStartX - swipeThreshold) {
-        changeSlide(galleryId, 1);
-      }
-      
-      if (touchEndX > touchStartX + swipeThreshold) {
-        changeSlide(galleryId, -1);
-      }
-    }
-
-    // Interactive Background Canvas
     // Interactive Background Canvas
     const canvas = document.getElementById('backgroundCanvas');
     const ctx = canvas.getContext('2d');
@@ -626,12 +667,6 @@
     function openWindow(workId) {
       const window = document.getElementById(workId);
       window.classList.add('active');
-      
-      // Reset gallery to first image when opening
-      if (galleries[workId]) {
-        galleries[workId].currentIndex = 0;
-        updateGallery(workId);
-      }
     }
 
     function closeWindow(workId) {
