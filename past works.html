@@ -320,9 +320,13 @@
     </div>
     <div class="folder" data-work="work11">
       <div class="folder-icon"></div>
-      <div class="folder-name">Photography</div>
+      <div class="folder-name">I Hear Light</div>
     </div>
     <div class="folder" data-work="work12">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Photography</div>
+    </div>
+        <div class="folder" data-work="work13">
       <div class="folder-icon"></div>
       <div class="folder-name">Design</div>
     </div>
@@ -589,8 +593,39 @@
     </div>
   </div>
 
-  <!-- Work 11 Window -->
+    <!-- Work 10 Window -->
   <div class="window" id="work11">
+    <div class="window-header">
+      <span class="window-title">I hear light</span>
+      <button class="close-btn" onclick="closeWindow('work10')">×</button>
+    </div>
+    <div class="window-content">
+      <h2>I hear light</h2>
+      <div class="image-gallery" data-gallery="work10">
+        <div class="gallery-track">
+          <div class="gallery-item"><img src="para1.jpg" alt="I Hear Light - Image 1"></div>
+          <div class="gallery-item"><img src="para2.jpg" alt="I Hear Light - Image 2"></div>
+          <div class="gallery-item"><img src="para3.jpg" alt="I Hear Light - Image 3"></div>
+          <div class="gallery-item"><a src="movieout.1.mov" alt="I Hear Light - Image 4"></div>
+
+        </div>
+        <div class="gallery-nav">
+          <button class="prev" onclick="changeSlide('work10', -1)">&#10094;</button>
+          <button class="next" onclick="changeSlide('work10', 1)">&#10095;</button>
+        </div>
+        <div class="gallery-counter"><span class="current">1</span> / <span class="total">1</span></div>
+      </div>
+      <p>This project is presented in conjuction with live music</p>
+      <p>it has been displayed in multiple iterations at Transactions, Experimental sounds and a range of other Music events</p>
+      <p>I hear light examines the relationship between sound, movement and self expression. The work utilises the sounds produced by live musicians and responds 
+        through an algorythm that generates a visual response. This seeks to mimic the human experience of engaging in a live music space, where we are able to relinquish the relentless demand to define
+      and unpack our self identity and expression with words, as we become controlled by the music. </p>
+      <p>Through creating an algorithm that responds to music, I aim to create a metaphor that explores our relationship to technology, self-expression, movement and sound.  </p>
+    </div>
+  </div>
+
+  <!-- Work 11 Window -->
+  <div class="window" id="work12">
     <div class="window-header">
       <span class="window-title">Photography</span>
       <button class="close-btn" onclick="closeWindow('work11')">×</button>
@@ -621,7 +656,7 @@
   </div>
 
   <!-- Work 12 Window -->
-  <div class="window" id="work12">
+  <div class="window" id="work13">
     <div class="window-header">
       <span class="window-title">Design</span>
       <button class="close-btn" onclick="closeWindow('work12')">×</button>
