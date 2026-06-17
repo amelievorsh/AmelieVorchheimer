@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Amelie Vorchheimer -- A \/oid</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: 'Geo', monospace;
+      background-color: black;
+      color: #ff0019;
+      overflow-x: hidden; /* prevent horizontal scroll */
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+    
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      background: transparent;
+      padding: 2rem 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .top-left {
+      font-size: 5rem;
+      color: #cd0011;
+      text-shadow: 0 0 5px #ef5c6b;
+      margin-bottom: 2rem;
+    }
+
+    section {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 2rem;
+    }
+
+    hr {
+      border: none;
+      height: 2px;
+      background-color: red;
+      width: 100%; 
+      margin: 1rem 0;
+    }
+
+    /* --- Accordion Outline Styling --- */
+    .accordion {
+      background-color: transparent;
+      color: #ff0019;
+      cursor: pointer;
+      padding: 1rem 1.5rem;
+      width: 100%;
+      text-align: left;
+      border: 2px solid #ff0019;
+      outline: none;
+      font-family: 'Geo', monospace;
+      font-size: 2.8rem;
+      text-shadow: 0 0 3px #e73b3d;
+      box-shadow: 0 0 5px rgba(255, 0, 25, 0.2);
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Keeps text left, GIF right */
+    }
+
+    /* Change to solid red fill with black text on active/hover states */
+    .active, .accordion:hover {
+      background-color: #ff0019;
+      color: black;
+      text-shadow: none;
+      box-shadow: 0 0 15px rgba(255, 0, 25, 0.6);
+    }
+
+    /* Styled slot for standard title images/Gifs */
+    .accordion-gif {
+      height: 50px;
+      width: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Panel Content Styling */
+    .panel {
+      padding: 1rem 18px 0 18px;
+      background-color: transparent;
+      display: none;
+      overflow: hidden;
+      border-left: 2px dashed #ff0019;
+      border-right: 2px dashed #ff0019;
+      border-bottom: 2px dashed #ff0019;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      text-shadow: 0 0 3px #e73b3d;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 2.2rem;
+      margin-left: 30px;
+      margin-top: 1.5rem;
+      text-shadow: 0 0 3px #e73b3d;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.5rem;
+      margin-left: 60px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 4px #e73b3d;
+    }
+
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      z-index: 20;
+    }
+
+    .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.4; }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .top-left { font-size: 3.5rem; }
+      .accordion { font-size: 2.3rem; }
+      h2 { font-size: 2.5rem; }
+      h3 { font-size: 2.2rem; margin-left: 20px; }
+      p { font-size: 1.3rem; margin-left: 40px; }
+      .clickable-image { width: 120px; }
+    }
+
+    @media (max-width: 768px) {
+      .top-left { font-size: 2.8rem; }
+      .accordion { font-size: 2rem; }
+      h2 { font-size: 2rem; }
+      h3 { font-size: 1.8rem; margin-left: 15px; }
+      p { font-size: 1.2rem; margin-left: 30px; }
+      .clickable-image { width: 100px; }
+      .accordion-gif { height: 40px; }
+    }
+
+    @media (max-width: 480px) {
+      .top-left { font-size: 2em; text-align: center; margin-bottom: 1.5rem; }
+      section { margin-left: 0; padding: 0 1rem; }
+      .accordion { font-size: 1.6rem; padding: 0.8rem 1rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.2rem; margin-left: 0; }
+      p { font-size: 1rem; margin-left: 0; }
+      .bottom-right { bottom: 10px; right: 10px; }
+      .clickable-image { width: 90px; }
+      .accordion-gif { height: 30px; }
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
+  <script src="spiral.js"></script>
+</head>
+<body>
+  <div id="overlay">
+    <div class="top-left">Amelie Vorchheimer</div>
+
+    <section>
+      <button class="accordion">
+        <span>BIO</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          Amelie is a queer multimedia artist working in Naarm Australia who works with video, installation, sound,
+          and new media art to explore non-violent forms of changemaking in response to identity politics online.
+        </p>
+        <p>
+          Due to finish their Bachelor of Fine Arts in January 2026, they are focused on community-based practice,
+          running the RMIT drawing club and hosting a number of DIY exhibitions. Their research unpacks the impacts and
+          potential responses to the attention economy, unpacking the rhizomatic nature of data mining practices,
+          neurodegeneration, and ability to critically engage.
+        </p>
+        <p>
+          Amelie’s practice dissects current uses and interactions with online spaces, and how this impacts interpersonal
+          relationships. Their practice aims to create a space that doubles as a site for inclusive engagement and play,
+          fostering critical engagement and reclamation of digital spaces. <br><br>
+        </p>
+      </div>
+
+      <hr>
+      <h1 style="margin-top: 2rem;">CV</h1>
+      <hr>
+
+      <button class="accordion">
+        <span>Personal Details</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          Amelie Vorchheimer<br>
+          amelievorsh@gmail.com<br>
+          @de_bug_001<br>
+          @de_bug_002<br><br>
+        </p>  
+      </div>
+
+      <button class="accordion">
+        <span>Education</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          Cert III - Music (Sound Production) 2022<br>
+          BA (Fine Arts Drawing) RMIT 2026 <br><br>
+        </p>
+      </div>
+        
+      <button class="accordion">
+        <span>Notable Experience and Achievements</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          President RMIT Drawing Club 2025 <br>
+          Industry Engagement Award RMIT <br>
+          Shortlist Counihan Summer Show 2025 <br><br>
+        </p>
+      </div>
+
+      <button class="accordion">
+        <span>Event / Exhibition Programming</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          Transactions 2026: <br>
+          Club event / digital arts showcase <br>
+          Drawing Club, 2025: <br>
+          Workshops, group crit sessions, Arts Auction fundraiser<br>
+          A fragment, 2024: <br>
+          Group Exhibition Curation and Organisation <br>
+          From the Shadows, 2025: <br>
+          Group Exhibition Curation and Organisation <br><br>
+        </p>
+      </div>
+
+      <button class="accordion">
+        <span>Selected Group Exhibitions</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <h3>2026</h3>
+        <p>
+          “Experimental Sounds”, Mixed Zoning, Many Hands Make <br>
+          “Loft”, Level III, sixtwelve<br>
+          “Love Language”, Abbotsford Convent, Platform Presents <br>
+          “Hybrid 2.0”, Misfits Bar, Fozza Presents <br>
+          “Transactions”, New Guernica Basement, Transactions
+        </p>
+        <h3>2025</h3>
+        <p>
+          “Graduate Exhibition”, RMIT <br>
+          “summer show” Shortlist, Counihan Gallery<br>
+          “POP POP” 612 Nicholls building, Practice Lab (Melbourne University)<br>
+          “Intersections II” Oddany Gallery, Sculpture Club RMIT<br>
+          “Q Files” Unassigned Gallery<br>
+          “IDAHOBIT”, Pride Pallette, Site Eight, RMIT 
+        </p>
+        <h3>2024</h3>
+        <p>
+          “Dark Arts” Miscellania<br>
+          “IDAHOBIT Pride Palette” site eight RMIT<br>
+          "A Fragment", House, Self Created<br>
+          "What Is It That It is?", RMIT University, Group Exhibition <br><br>
+        </p>
+      </div>
+        
+      <button class="accordion">
+        <span>Music / Performance</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <h3>2026</h3>
+        <p>
+          “Transactions”, DJ, new guernica, Transactions<br>
+          “Dub Resolve”, DJ, unnamed location, Practice Resolve<br>
+          “Loft”, Strudel Live coding, Lvl III, sixtwelve<br>
+          “Loft”, Hydra Live coding, Lvl III, sixtwelve<br>
+          “Experimental Sounds”, Touch designer Audio Reactive Visuals, Mixed Zoning, Many Hands Make<br>
+          “The 116”, DJ, 116, Josh<br>
+          “Portrait exhibition”, DJ, Reservoir Library, Decibels Darebin<br>
+          Workshop Bar, DJ<br>
+          Bar 55, DJ<br>
+        </p>
+        <h3>2025</h3>
+        <p>
+          “NDME 5”, Visuals Coburg Studio, NDME <br>
+          “Grad Show After Party” Miscellania, Visuals, Sculpture Club <br>
+          “116”, DJ, 116, Josh & Will <br><br>
+        </p>
+      </div>
+        
+      <button class="accordion">
+        <span>Design</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <h3>2026</h3>
+        <p>
+          Poster Design for justtrustmeman movie club @ Palomino bar <br>
+          Post Design for justtrustmeman movie club @ Palomino bar <br>
+          Poster / Asset design Transactions (events series) <br>
+          Resume Design Commissions (x3) <br>
+          Website design Commissions - multiple ongoing projects 
+        </p>
+        <h3>2025</h3>
+        <p>
+          Asset Design RMIT Drawing Club <br>
+          Poster design RMIT Drawing Club <br>
+          Ticket Design - Drawing Club <br>
+          Spatial Design / Curation, auction RMIT <br>
+          Marketing planning RMIT Drawing Club <br>
+          Poster Design, From The Shadows <br>
+          Spatial Design & Curation, From the Shadows 
+        </p>
+        <h3>2024</h3>
+        <p>
+          Vis Ink (Student Publication) asset design  <br> 
+          A Fragment exhibition design  <br>
+          A Fragment Asset, Poster and Ticketing design <br><br>
+        </p> 
+      </div> 
+
+      <button class="accordion">
+        <span>Upcoming</span>
+        <img src="your-gif-here.gif" alt="" class="accordion-gif">
+      </button>
+      <div class="panel">
+        <p>
+          Live coding @233 space nicolson <br>
+          Interactive Installation @233 <br>
+          Transactions Checkpoints - Event Organiser / Curator <br>
+          Transactions Checkpoints live coding / Experimental Set <br><br>
+        </p> 
+      </div>    
+      <hr>
+    </section>
+
+    <div class="bottom-right">
+      <a href="Index page 1.html">
+        <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image">
+      </a>
+      <div class="caption">home</div>
+    </div>
+  </div>
+
+  <script>
+    var acc = document.getElementsByClassName("accordion");
+    var i;
+
+    for (i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var panel = this.nextElementSibling;
+        if (panel.style.display === "block") {
+          panel.style.display = "none";
+        } else {
+          panel.style.display = "block";
+        }
+      });
+    }
+  </script>
+</body>
+</html>
