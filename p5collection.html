@@ -1,26 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5.js Collection Matrix</title>
 
-    <title>p5.js Collection</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo&display=swap" rel="stylesheet">
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
+  
       <style>
 
-           html, body {
+    html, body {
       background-color: #05010c;
       color: #ff0033;
       font-family: 'Geo', monospace;
+      margin: 0;
+      padding: 20px;
       height: 100%;
-      width: 100%;
+      overflow-y: auto; /* Allow scrolling through your grid array */
+    }
+
+    /* Cyberpunk Grid Grid Configurations */
+    .container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      padding: 20px;
+    }
+
+    .grid-item {
+      background: #000;
+      border: 1px solid #ff0033;
+      box-shadow: 0 0 10px rgba(255, 0, 51, 0.2);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 300px;
       overflow: hidden;
     }
-        
-        .container {
-  display: grid;
-          color: #8A2BE2
-}
        </style>  
     <link rel="stylesheet" type="text/css" href="style.css">
 
