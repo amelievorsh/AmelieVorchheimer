@@ -61,3 +61,5 @@ function draw() {
     t += 0.03; // advance time
   }
 }
+
+new p5(sketch2, 'sketch-holder-2');
