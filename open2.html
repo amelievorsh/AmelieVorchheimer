@@ -1,165 +1,532 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>when your body is the tool</title>
+  <meta charset="UTF-8" />
+  <title>Amelie's World - Terminal Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
+  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
+  
   <style>
-    html, body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Geo', sans-serif;
-      background-color: #34006b; /* <-- choose your base color */
-      position: relative;
     }
 
-    /* Add the background image as a semi-transparent overlay */
+    html, body {
+      background-color: #05010c;
+      color: #ff0033;
+      font-family: 'Geo', monospace;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      justify-content: center;
+      cursor: crosshair;
+    }
+
+    /* Ambient scanline distortion texture layer overlay */
     body::before {
-      content: "";
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    #sketch-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: url('script screenshot.jpg') no-repeat left center fixed;
-      background-size: cover;
-      opacity: 0.5; /* <-- adjust transparency (0.0 = fully transparent, 1.0 = opaque) */
-      z-index: 0; /* keeps it behind all content */
+      z-index: 1;
+      pointer-events: none;
     }
 
-    /* Top-left text */
-    .top-left {
+    /* Draggable Main Frame Window Container */
+    #face-mesh-emulator {
       position: absolute;
-      top: 20rem;
-      left: 20rem;
-      color: #00cd33;
-      font-size: 5rem;
-      text-shadow: 0 0 8px #051806, 0 0 8px #21a525;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000000;
+      border: 3px solid #ff0033;
+      padding: 45px 15px 15px 15px;
+      box-shadow: 0px 0px 30px rgba(255, 0, 51, 0.4);
+      z-index: 5;
+      pointer-events: auto;
+      cursor: move;
     }
 
-    @media (max-width: 768px) {
-      .top-left {
-        top: 4rem;
-        left: 1rem;
-        font-size: 2rem;
-      }
+    /* System Control Header Styling */
+    #face-mesh-emulator::before {
+      content: "■ SYS_EMULATION // Click facial data clusters to navigate node pathway";
+      position: absolute;
+      top: 10px;
+      left: 15px;
+      font-size: 1.4rem;
+      color: #00ff66;
+      text-shadow: 0 0 5px rgba(0, 255, 102, 0.8);
+      letter-spacing: 1px;
     }
 
-    @media (max-width: 480px) {
-      .top-left {
-        top: 4rem;
-        left: 0.5rem;
-        font-size: 2rem;
-      }
-    }
-
-    /* Bottom-right button */
-    .bottom-right {
+    #title {
       position: fixed;
-      bottom: 20px;
-      right: 20px;
+      left: 40px;
+      top: 30px;
+      font-size: 5rem;
+      color: #ff0033;
+      letter-spacing: 3px;
+      text-shadow: 0 0 10px rgba(255, 0, 51, 0.8);
+      z-index: 10;
+      text-transform: uppercase;
+    }
+
+    /* Side Column Navigation Layout Panels */
+    .lefttable, .righttable {
+      position: fixed;
+      top: 150px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    .lefttable { left: 40px; }
+    .righttable { right: 40px; }
+
+    .menu-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: rgba(10, 2, 20, 0.6);
+      border: 1px dashed #ff0033;
+      padding: 12px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: #ff0033;
+      transform: scale(1.05);
+      box-shadow: 0 0 15px #ff0033;
+    }
+
+    .menu-item:hover .folder-name {
+      color: #000;
+      text-shadow: none;
+    }
+
+    .folder-icon {
+      width: 60px;
+      height: 45px;
+      background: #ff0033;
+      clip-path: polygon(0% 15%, 35% 15%, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
+      margin-bottom: 8px;
+    }
+
+    .menu-item:hover .folder-icon {
+      background: #000;
+    }
+
+    .folder-name {
+      color: #ff0033;
+      font-size: 1.3rem;
       text-align: center;
-      z-index: 1000;
+      text-shadow: 0 0 5px rgba(255, 0, 51, 0.6);
+    }
+
+    /* Navigational Media Link Objects */
+    .media-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #00ff66;
+      padding: 10px;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
     }
 
     .clickable-image {
-      border: none;
-      cursor: pointer;
-      width: 150px;
+      border: 0;
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
       transition: transform 0.3s ease;
     }
 
-    @media (max-width: 480px) {
-      .clickable-image {
-        width: 90px;
-      }
-    }
-
-    .clickable-image:hover {
-      transform: scale(1.05);
+    .media-card:hover .clickable-image {
+      transform: scale(1.1) rotate(2deg);
     }
 
     .caption {
-      font-size: 2rem;
-      color: #00ff37;
-      margin-top: 5px;
-      font-family: 'Geo', sans-serif;
-      animation: blink 1s steps(1) infinite;
+      font-size: 1.1rem;
+      color: #00ff66;
+      margin-top: 6px;
+      text-shadow: 0 0 5px rgba(0,255,102,0.5);
     }
 
-    @keyframes blink {
-      50% { opacity: 0.4; }
-    }
-
-    /* Alert box */
+    /* Interactive Alert Box Terminal */
     .alert-box {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      background-color: #000000;
-      border: 3px solid rgb(187, 28, 187);
-      padding: 15px;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgb(127, 0, 139);
+      background-color: #000;
+      border: 2px solid #00ff66;
+      padding: 25px;
+      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
       z-index: 2000;
-      display: none;
+      display: block;
       text-align: center;
-      color: purple;
-      max-width: 80%;
-      width: 400px;
+      width: 420px;
+      max-width: 85%;
     }
 
     .alert-box p {
       margin: 0 0 20px 0;
-      font-size: 2rem;
-      line-height: 1.4;
+      font-size: 1.8rem;
+      line-height: 1.3;
+      color: #00ff66;
     }
 
     .alert-box button {
-      background-color: purple;
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 5px;
+      background-color: transparent;
+      color: #00ff66;
+      border: 1px solid #00ff66;
+      padding: 8px 20px;
+      font-family: 'Geo', monospace;
+      font-size: 1.4rem;
       cursor: pointer;
-      font-family: 'Courier New Bold', monospace, 'Courier New', Courier;
-      font-size: 1.2rem;
-      transition: background-color 0.3s ease;
+      transition: all 0.2s;
     }
 
     .alert-box button:hover {
-      background-color: darkmagenta;
+      background-color: #00ff66;
+      color: #000;
+    }
+
+    /* Screen Breakpoint Responsive Adjustments */
+    @media (max-width: 1024px) {
+      #title { font-size: 3.5rem; left: 20px; top: 15px; }
+      .lefttable, .righttable { top: auto; bottom: 20px; flex-direction: row; gap: 15px; }
+      .lefttable { left: 20px; }
+      .righttable { right: 20px; }
+      #face-mesh-emulator { width: 95vw; height: auto; max-width: 640px; }
+    }
+
+    @media (max-width: 640px) {
+      #title { font-size: 2.5rem; width: 100%; text-align: center; left: 0; }
+      .lefttable { display: none; } /* Hide technical tables on compact mobiles to avoid overlap */
+      .righttable { left: 50%; right: auto; transform: translateX(-50%); bottom: 15px; width: max-content; }
+      .media-card { padding: 6px; }
+      .clickable-image { width: 70px; height: 70px; }
     }
   </style>
 </head>
+
 <body>
-  <div class="top-left">Welcome to Algorythmic Meditations
-    <p>Please use charcoal to trace the projection</p>
+
+  <div id="title">Amelie Vorchheimer</div>
+    
+  <div class="lefttable">
+    <div class="menu-item" onclick="window.location.href='mailto:your-email@domain.com'">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Contact me</div>
+    </div>
+    <div class="menu-item" onclick="window.location.href='socials.html'">
+      <div class="folder-icon"></div>
+      <div class="folder-name">Socials</div>
+    </div>
+    <div class="menu-item" onclick="window.location.href='p5-collection.html'">
+      <div class="folder-icon"></div>
+      <div class="folder-name">p5.js Projects</div>
+    </div>
   </div>
 
-  <div class="bottom-right">
-      <img src="Artificial Intelligence Hello Sticker.gif" alt="Go Button" class="clickable-image" 
-           onerror="this.onerror=null; this.src='https://placehold.co/150x150/FF69B4/FFFFFF?text=Go!';"/>
-
-  <div id="customAlert" class="alert-box">
-    <p>this work explores the relationship between the body and technology,
-        emphasizing the body's role as an active participant rather than a passive user.<br><br></p>
-    <button id="alertDoneButton">ILLUSION</button>
+  <div class="righttable">
+    <div class="media-card">
+      <a href="Aboutme.html">
+        <img src="Party Dancing Sticker.gif" alt="About Link" class="clickable-image" />
+      </a>
+      <div class="caption">ABOUT</div>
+    </div>
+    <div class="media-card">
+      <a href="past works.html">
+        <img src="dance robot Sticker by Softest Hard.gif" alt="Works Link" class="clickable-image" />
+      </a>
+      <div class="caption">PORTFOLIO</div>
+    </div>
+    <div class="media-card">
+      <a href="Index page 1.html">
+        <img src="3D Spin Sticker by Larry Toxic.gif" alt="Index Link" class="clickable-image" />
+      </a>
+      <div class="caption">SYSTEM</div>
+    </div>
   </div>
 
-  <script>
-    window.onload = function() {
-      const alertBox = document.getElementById('customAlert');
-      const alertDoneButton = document.getElementById('alertDoneButton');
-      setTimeout(() => alertBox.style.display = 'block', 1000);
-      alertDoneButton.addEventListener('click', () => alertBox.style.display = 'none');
-    };
-  </script>
-</body>
+  <div class="alert-box" id="myAlertBox">
+    <p>> INITIALIZING BIOMETRIC FEED...<br>> CALIBRATING FACE MESH EMULATOR...</p>
+    <button onclick="document.getElementById('myAlertBox').style.display='none'">ACCESS PORTAL</button>
+  </div>
+
+  <div id="sketch-container"></div>
+
+<script> 
+  // Connected Routing Targets for Webcam Hotspots
+  const LINK_LEFT_EYE = 'Aboutme.html';   
+  const LINK_RIGHT_EYE = 'past works.html';  
+  const LINK_MOUTH = 'Index page 1.html';      
+  
+  let winWidth = 640;
+  let winHeight = 480;
+  let video;
+  let faceMesh;
+  let faces = [];
+  let triangles;
+  let t = 0; 
+  let displaceColors;
+  let canvas;
+
+  // Interaction vectors matching running draw loops
+  let btnLeft = { x: 0, y: 0, rad: 25, hovered: false };
+  let btnRight = { x: 0, y: 0, rad: 25, hovered: false };
+  let btnMouth = { x: 0, y: 0, rad: 25, hovered: false };
+
+  // Draggable Window Variables
+  let emuDiv;
+  let isDragging = false;
+  let dragStartX, dragStartY;
+  let winLeft, winTop;
+
+  // GLSL Shader configuration for the Glitch Chromatic Aberration
+  let displaceColorsSrc = `
+  precision highp float;
+  uniform sampler2D tex0;
+  varying vec2 vTexCoord;
+
+  vec2 zoom(vec2 coord, float amount) {
+    vec2 relativeToCenter = coord - 0.5;
+    relativeToCenter /= amount;
+    return relativeToCenter + 0.5;
+  }
+
+  void main() {
+    gl_FragColor = vec4(
+      texture2D(tex0, vTexCoord).r,
+      texture2D(tex0, zoom(vTexCoord, 1.06)).g,
+      texture2D(tex0, zoom(vTexCoord, 1.02)).b,
+      texture2D(tex0, vTexCoord).a
+    );
+  }
+  `;
+
+  function preload() {
+    faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
+  }
+
+  function gotFaces(results) {
+    faces = results;
+  }
+
+  function setup() {
+    // Generate parent moveable Window box wrapper
+    emuDiv = select("#face-mesh-emulator");
+    if(!emuDiv) {
+      emuDiv = createDiv();
+      emuDiv.id("face-mesh-emulator");
+    }
+    emuDiv.parent("sketch-container");
+
+    // Dynamic central screen initialization calculation
+    winLeft = window.innerWidth / 2;
+    winTop = window.innerHeight / 2;
+    emuDiv.position(winLeft, winTop);
+
+    // Structural window movement event execution mappings
+    emuDiv.elt.addEventListener('mousedown', startDrag);
+    window.addEventListener('mousemove', dragWindow);
+    window.addEventListener('mouseup', stopDrag);
+
+    // Canvas construction configuration setup
+    canvas = createCanvas(winWidth, winHeight);
+    canvas.parent(emuDiv);
+    canvas.style('display', 'block');
+    canvas.style('z-index', '2');
+
+    video = createCapture(VIDEO, { flipped: true });
+    video.size(winWidth, winHeight);
+    video.hide();
+    
+    displaceColors = createFilterShader(displaceColorsSrc);
+    faceMesh.detectStart(video, gotFaces);
+    triangles = faceMesh.getTriangles();
+  }  
+
+  function draw() {
+    background(0);
+    if (video.loadedmetadata) {
+      image(video, 0, 0, winWidth, winHeight);
+    }
+    
+    filter(THRESHOLD, 0.35);
+    filter(INVERT);
+    filter(displaceColors);
+
+    if (faces.length > 0) {
+      let face = faces[0];
+
+      beginShape(TRIANGLES);
+      noFill();
+      stroke(255, 0, 51, 90); /* Glowing cyber-crimson net matrix lines */
+      strokeWeight(1);
+
+      for (let i = 0; i < triangles.length; i++) {
+        let tri = triangles[i];
+        let [a, b, c] = tri;
+
+        let pointA = face.keypoints[a];
+        let pointB = face.keypoints[b];
+        let pointC = face.keypoints[c];
+
+        let amp = 8;     
+        let freq = 0.5;  
+        let ax = pointA.x + sin(t + i * freq) * amp / PI;
+        let ay = pointA.y;
+
+        vertex(ax, ay);
+        vertex(pointB.x, pointB.y);
+        vertex(pointC.x, pointC.y);
+      }
+      endShape();
+      t += 0.04; 
+    }
+     
+    for (const face of faces){
+      let leftEye = face.leftEye;
+      let rightEye = face.rightEye;
+      let lips = face.lips;
+        
+      // Offset calculation alignments
+      let LIx = leftEye.centerX + 40;
+      let LIy = leftEye.centerY - 40;
+
+      let Rx = rightEye.centerX - 160;
+      let Ry = rightEye.centerY - 40;
+
+      let Mx = lips.centerX - 60;
+      let My = lips.centerY + 50;
+
+      // Coordinate matching conversions
+      btnLeft.x = LIx + 15;  btnLeft.y = LIy + 10;
+      btnRight.x = Rx + 25;  btnRight.y = Ry + 10;
+      btnMouth.x = Mx - 10;  btnMouth.y = My - 10;
+
+      // Track hovering updates relative to coordinates within the container canvas view bounds
+      btnLeft.hovered = dist(mouseX, mouseY, btnLeft.x, btnLeft.y) < btnLeft.rad;
+      btnRight.hovered = dist(mouseX, mouseY, btnRight.x, btnRight.y) < btnRight.rad;
+      btnMouth.hovered = dist(mouseX, mouseY, btnMouth.x, btnMouth.y) < btnMouth.rad;
+
+      // Target system connector tracks
+      strokeWeight(1);
+      stroke(0, 255, 102, 180);
+      line(leftEye.centerX, leftEye.centerY, btnLeft.x, btnLeft.y);
+      line(rightEye.centerX, rightEye.centerY, btnRight.x, btnRight.y);
+      line(lips.centerX, lips.centerY, btnMouth.x, btnMouth.y);
+        
+      // Text generation layouts
+      textFont('Geo');
+      textSize(32);
+      noStroke();
+      
+      fill(btnLeft.hovered ? '#ff0033' : '#00ff66');
+      text("// ACCESS_ABOUT", LIx, LIy);
+
+      fill(btnRight.hovered ? '#ff0033' : '#00ff66');
+      text("// VIEW_PORTFOLIO", Rx - 20, Ry);
+
+      fill(btnMouth.hovered ? '#ff0033' : '#00ff66');
+      text("// LOAD_SYSTEM", Mx, My);
+
+      // Track Point Target Nodes Visual Display
+      strokeWeight(btnLeft.hovered ? 14 : 8);
+      stroke(255, 0, 51);
+      point(btnLeft.x, btnLeft.y);
+
+      strokeWeight(btnRight.hovered ? 14 : 8);
+      stroke(255, 0, 51);
+      point(btnRight.x, btnRight.y);
+
+      strokeWeight(btnMouth.hovered ? 14 : 8);
+      stroke(255, 0, 51);
+      point(btnMouth.x, btnMouth.y);
+    } 
+  }
+
+  // Handle route switching selections securely
+  function mousePressed() {
+    if (!isDragging) {
+      if (btnLeft.hovered) {
+        window.location.href = LINK_LEFT_EYE;
+      } else if (btnRight.hovered) {
+        window.location.href = LINK_RIGHT_EYE;
+      } else if (btnMouth.hovered) {
+        window.location.href = LINK_MOUTH;
+      }
+    }
+  }
+
+  // Window drag execution control structures
+  function startDrag(e) {
+    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) return;
+    
+    isDragging = true;
+    let style = window.getComputedStyle(emuDiv.elt);
+    let matrix = new WebKitCSSMatrix(style.transform);
+    
+    // Account for the baseline CSS layout center point translation offset
+    dragStartX = e.clientX - matrix.m41;
+    dragStartY = e.clientY - matrix.m42;
+  }
+
+  function dragWindow(e) {
+    if (!isDragging) return;
+    let newX = e.clientX - dragStartX;
+    let newY = e.clientY - dragStartY;
+    
+    // Retain translate state parameters to keep mouse sync matching cleanly
+    emuDiv.style('transform', `translate(${newX}px, ${newY}px)`);
+  }
+
+  function stopDrag() {
+    isDragging = false;
+  }
+
+  // Dynamically reset window bounds parameters if view scaling layout adjusts
+  function windowResized() {
+    winLeft = window.innerWidth / 2;
+    winTop = window.innerHeight / 2;
+    if(!isDragging) {
+      emuDiv.position(winLeft, winTop);
+      emuDiv.style('transform', 'translate(-50%, -50%)');
+    }
+  }
+</script>
+    
+</body> 
 </html>
