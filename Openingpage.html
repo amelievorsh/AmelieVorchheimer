@@ -82,24 +82,21 @@
       pointer-events: none;
     }
 
-   .gif-media-wall {
-  width: 65%;
-  height: 100%;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  grid-gap: 30px;
-  padding: 20px;
-  align-content: start;
+.icon-cluster {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  display: flex;
+  gap: 25px; /* Spaces them horizontally */
+  z-index: 20;
 }
 
-.gif-card {
+.icon-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  width: 120px;
 }
-
 /* Mobile Responsiveness Override */
 
 
@@ -126,12 +123,14 @@
       50% { opacity: 0.4; }
     }
 
-    @media (max-width: 768px) {
-  #overlay { flex-direction: column; overflow-y: auto; padding: 20px; }
-  .brand-panel { width: 100%; margin-bottom: 30px; text-align: center; }
-  .gif-media-wall { width: 100%; height: auto; overflow: visible; grid-template-columns: repeat(2, 1fr); }
-  .top-left { font-size: 3rem; }
-  .artist-info { font-size: 1.8rem; }
+  @media (max-width: 480px) {
+  .icon-cluster {
+    position: relative;
+    bottom: auto; right: auto;
+    margin-top: 40px;
+    justify-content: center;
+    width: 100%;
+  }
 }
     
     /* -------- Responsive Adjustments -------- */
@@ -304,25 +303,18 @@
   <div id="overlay">
     <div class="top-left">Amelie Vorchheimer</div>
     <div class="artist-info">A bug in the code</div>
-    <div class="bottom-right">
-      <a href="Aboutme.html">
-        <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image" />
-      </a>
-      <div class="gif-media-wall">
-      
-      <div class="gif-card">
-        <a href="Aboutme.html">
-          <img src="spinning_1_1.gif" alt="About Me" class="clickable-image" />
-        </a>
-        <div class="caption">About Me</div>
-      </div>
-      
-      <div class="gif-card">
-        <a href="past works.html">
-          <img src="Artificial Intelligence Hello Sticker.gif" alt="Past Works" class="clickable-image" />
-        </a>
-        <div class="caption">Past Works</div>
-      </div>
+
+    <div class="icon-cluster">
+  <div class="icon-item">
+    <a href="Aboutme.html"><img src="spinning_1_1.gif" class="clickable-image"></a>
+    <div class="caption">About Me</div>
+  </div>
+  <div class="icon-item">
+    <a href="past works.html"><img src="Artificial Intelligence Hello Sticker.gif" class="clickable-image"></a>
+    <div class="caption">Past Works</div>
+  </div>
+</div>
+
     </div>
   </div>
 </body>
