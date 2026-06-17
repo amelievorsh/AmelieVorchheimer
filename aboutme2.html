@@ -6,8 +6,9 @@
   <title>Site Signals</title>
   <style>
 .accordion {
-  background-color: #eee;
-  color: #444;
+  background-color: black;
+  color: #ff0019;
+  font-family: 'Geo', monospace;
   cursor: pointer;
   padding: 18px;
   width: 100%;
@@ -17,11 +18,31 @@
   transition: 0.4s;
 }
 
+     body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+    
+
 /* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
 .active, .accordion:hover {
   background-color: #ccc;
 }
 
+     .top-left {
+      font-size: 5rem;
+      color: #cd0011;
+      text-shadow: 0 0 5px #ef5c6b;
+      margin-bottom: 2rem;
+    }
+
+    
 /* Style the accordion panel. Note: hidden by default */
 .panel {
   padding: 0 18px;
@@ -30,7 +51,10 @@
   overflow: hidden;
 }
 </style>
+  <div class="top-left"> Artist CV</div>
+  
 <button class="accordion">BIO</button>
+
 <div class="panel">
        <p>
         Amelie is a queer multimedia artist working in Naarm Australia who works with video, installation, sound,
