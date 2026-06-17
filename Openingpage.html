@@ -82,19 +82,25 @@
       pointer-events: none;
     }
 
-    .bottom-right {
-      position: absolute;
-      bottom: 20px;
-      right: 20px;
-      text-align: center;
-    }
+   .gif-media-wall {
+  width: 65%;
+  height: 100%;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-gap: 30px;
+  padding: 20px;
+  align-content: start;
+}
 
-     .bottom-righta {
-      position: absolute;
-      bottom: 20px;
-      right: 80px;
-      text-align: center;
-    }
+.gif-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Mobile Responsiveness Override */
 
 
     .clickable-image {
@@ -120,6 +126,14 @@
       50% { opacity: 0.4; }
     }
 
+    @media (max-width: 768px) {
+  #overlay { flex-direction: column; overflow-y: auto; padding: 20px; }
+  .brand-panel { width: 100%; margin-bottom: 30px; text-align: center; }
+  .gif-media-wall { width: 100%; height: auto; overflow: visible; grid-template-columns: repeat(2, 1fr); }
+  .top-left { font-size: 3rem; }
+  .artist-info { font-size: 1.8rem; }
+}
+    
     /* -------- Responsive Adjustments -------- */
     @media (max-width: 1024px) {
       .top-left {
@@ -294,14 +308,21 @@
       <a href="Aboutme.html">
         <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image" />
       </a>
+      <div class="gif-media-wall">
       
-      <div class="caption">About Me</div>
-    </div>
-        <div class="bottom-righta">
-      <a href="past works.html">
-        <img src="Artificial Intelligence Hello Sticker.gif" alt="Go Button" class="clickable-image" />
-      </a>
-      <div class="caption">Past Works</div>
+      <div class="gif-card">
+        <a href="Aboutme.html">
+          <img src="spinning_1_1.gif" alt="About Me" class="clickable-image" />
+        </a>
+        <div class="caption">About Me</div>
+      </div>
+      
+      <div class="gif-card">
+        <a href="past works.html">
+          <img src="Artificial Intelligence Hello Sticker.gif" alt="Past Works" class="clickable-image" />
+        </a>
+        <div class="caption">Past Works</div>
+      </div>
     </div>
   </div>
 </body>
