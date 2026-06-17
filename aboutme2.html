@@ -1,0 +1,92 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Site Signals</title>
+  <style>
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+
+/* Style the accordion panel. Note: hidden by default */
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  display: none;
+  overflow: hidden;
+}
+</style>
+<button class="accordion">BIO</button>
+<div class="panel">
+       <p>
+        Amelie is a queer multimedia artist working in Naarm Australia who works with video, installation, sound,
+        and new media art to explore non-violent forms of changemaking in response to identity politics online.
+      </p>
+      <p>
+        Due to finish their Bachelor of Fine Arts in January 2026, they are focused on community-based practice,
+        running the RMIT drawing club and hosting a number of DIY exhibitions. Their research unpacks the impacts and
+        potential responses to the attention economy, unpacking the rhizomatic nature of data mining practices,
+        neurodegeneration, and ability to critically engage.
+      </p>
+      <p>
+        Amelie’s practice dissects current uses and interactions with online spaces, and how this impacts interpersonal
+        relationships. Their practice aims to create a space that doubles as a site for inclusive engagement and play,
+        fostering critical engagement and reclamation of digital spaces. <br><br></p>
+</div>
+
+<button class="accordion">Personal Details</button>
+<div class="panel">
+  <p>email - amelievorsh@gmail.com.</p>
+  <p>instagram - @de_bug_001, @de_bug_002</p>
+</div>
+
+<button class="accordion">Event / Exhibition Programming</button>
+<div class="panel">
+   <p>
+        Transactions 2026: <br>
+        Club event / digital arts showcase <br>
+        Drawing Club, 2025: <br>
+Workshops, group crit sessions, Arts Auction fundraiser<br>
+A fragment, 2024: <br>
+Group Exhibition Curation and Organisation <br>
+
+From the Shadows, 2025: <br>
+Group Exhibition Curation and Organisation <br><br>
+      </p>
+  
+</div>
+
+  
+  <script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    } 
+  });
+}
+</script>
+  </body>
+</html>
+
