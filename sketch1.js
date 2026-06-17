@@ -60,3 +60,5 @@ function draw() {
   let amp = (0.2, 0.8, 0.7);
   osc.amp(amp);
 }
+
+new p5(sketch1, 'sketch-holder-1');
