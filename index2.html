@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>flourish</title>
+  <style>
+    body, html {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    font-family: 'Courier New', monospace;
+    background-color: rgb(0, 0, 0);
+    color: #7226c3;
+  }
+
+  h1 {
+      font-size: 2rem;
+      color: #7400f0;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 2px #9369f5;
+    }
+
+  
+  canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+  
+  .content {
+    display: flex;
+    justify-content: space-between;
+    padding: 4rem;
+  }
+  
+  .text-column {
+    width: 35%;
+    padding-right: 2rem;
+  }
+  
+  .video-column {
+    width: 60%;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  .video-section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  
+  .annotation {
+    background-color: #4c0771;
+    color: #efa7ff;
+    padding: 10px;
+    width: 40%;
+    box-sizing: border-box;
+  }
+  
+  .video-container {
+    width: 80%;
+  }
+  
+  .video-container video {
+    width: 100%;
+    height: auto;
+    border: 2px solid #4b1b4f;
+    border-radius: 0px;
+    box-shadow: 0 0 20px rgba(69, 5, 119, 0.3);
+  }
+  
+  .gif-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(64, 4, 90, 0.341);
+    display: flex;
+    justify-content: space-around;
+    padding: 5px 0;
+    z-index: 10;
+  }
+  
+  .gif-bar img {
+    height: 100px;
+    cursor: pointer;
+    border: 0px solid #4b1b4f;
+    transition: transform 0.2s;
+  }
+  
+  .gif-bar img:hover {
+    transform: scale(1.1);
+  }
+  
+  </style>
+</head>
+<body>
+
+
+  <div class="content">
+    <div class="text-column">
+      <h1>Conceptually speaking</h1>
+      <p> let the glitches wash over you.
+        <br> 
+        <br>
+        <br>
+        This is a space where creativity and technology collide. 
+        A space where I distort information, experiences, and perception to generate
+        new layers of meaning.
+        <br>
+        <br>
+        The cloud is a space where I exist without bounds, without definition.
+        Multiplicity as a concept embodies the idea that the self is not fixed, 
+        but rather in a state of flux. I engage 
+         the power of employing online space to reject colonial structures of singularity.
+        <br>
+        <br>
+        We exist in a flux of identities and realities both AFK and digitally. 
+        Embracing these identity fluxes and encouraging existing in the in-between, 
+        through refusing categorization, am I an artist? am I coder? am I a designer? am I a computer?
+        <br><br>
+        “individual attention forms the basis for collective attention and thus for meaningful refusal of all kinds.”(Odell, 2019:75).
+         Thus, acts of refusal (being acknowledged) are contingent on a society adhering to the status quo. 
+        <br>
+        <br>
+         Acknowledge the quiet acts of acting unexpectedly as a tool to disrupt. Embrace the third space.
+         <h1>Welcome to the Third Space</h1>
+        <strong>Click on the GIFs below to navigate to different sections of my site.</strong>
+
+      </p>
+    </div>
+
+    <div class="video-column">
+      <div class="video-section">
+        <div class="annotation">
+          <p><strong>Line up for tea, 2024 - </strong> This video is created from a sound analysis tool, 
+            the sounds used were recorded during disucssions hosted in 2024 that aimed to investigate methods for 
+            non-violent forms of changemaking. The video obstructs the content of the discussions as a comment on 
+        technologies ability to distrct us from critically engaging.</p>
+        </div>
+        <div class="video-container">
+            <video autoplay muted loop playsinline poster="thumbnail.jpg">
+                <source src="line up for tea.mp4" type="video/mp4"/>
+              </video>
+        </div>
+      </div>
+
+      <div class="video-section">
+        <div class="annotation">
+          <p><strong>3, 2024 - </strong> 3 is a similar concept to line up for tea, however, in it's generation, 
+            were 3 sperate discussions which were untited through video editing and sound 
+            analysis to once again obstruct understanding and interpretation.</p>
+        </div>
+        <div class="video-container">
+          <video autoplay muted loop playsinline>
+            <source src="3.mp4" type="video/mp4"/>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </div>
+ </div>
+      <div class="video-section">
+        <div class="annotation">
+          <p><strong>training to disengage, 2025 - </strong>drawing on memory and repetitive experience, this body of work engages with
+        productivy narratives within captilist frameworks. The narrative of the office worker, the student, who engage with reptitve acts of 
+    relocation. Thus we disengage through the interenet, and the internet becomes a stylistic refrence for thep iece, which replicates a 
+disjointed experience of transit.</p>
+       
+</div>
+        <div class="video-container">
+          <video autoplay muted loop playsinline>
+            <source src="train fin 1.mp4" type="video/mp4"/>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+      <div class="video-section">
+        <div class="annotation">
+          <p><strong>dotted pattern 2025 - </strong> This video wa made using processing, a coding language for creativity.
+        I aim to demonstrate simple algorythmic output in a creative form. </p>
+        </div>
+        <div class="video-container">
+          <<video autoplay muted loop playsinline poster="thumbnail.jpg">
+            <source src="the dot generator.mp4" type="video/mp4"/>
+            Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+     
+
+  <div class="gif-bar">
+    <a href="page1.html"><img src="party rage Sticker by Studios Stickers.gif" alt="GIF 1" /></a>
+    <a href="page2.html"><img src="The Simpsons Dancing Sticker.gif" alt="GIF 2" /></a>
+    <a href="page3.html"><img src="Happy Winnie The Pooh Sticker.gif" alt="GIF 3" /></a>
+    <a href="page4.html"><img src="happy cat GIF.gif" alt="GIF 4" /></a>
+    <a href="page5.html"><img src="weird video games Sticker.gif" alt="GIF 5" /></a>
+    <a href="page6.html"><img src="Party Dancing Sticker.gif" alt="GIF 6" /></a>
+  </div>
+</body>
+</html>
