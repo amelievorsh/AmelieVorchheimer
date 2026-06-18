@@ -14,7 +14,7 @@ function setup() {
 function draw() {
   // Low alpha creates an ongoing neon trail effect
   //background(128, 51, 153, 20); 
-background(40, 20, 70);
+background(40, 20, 70, 20);
   // Update and render all active generative systems inside the global array
   for (let i = spirals.length - 1; i >= 0; i--) {
     spirals[i].update();
