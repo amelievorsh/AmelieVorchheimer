@@ -3,7 +3,7 @@ let autoSpawnInterval;
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  background(5, 1, 12); // Deep dark canvas base
+  background(40, 20, 70); // Deep dark canvas base
 
   // Check if screen is small (phone) to trigger auto-spawning
   if (windowWidth < 768) {
