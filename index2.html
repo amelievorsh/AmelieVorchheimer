@@ -1,204 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>flourish</title>
-  <style>
-    body, html {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    font-family: 'Courier New', monospace;
-    background-color: rgb(0, 0, 0);
-    color: #7226c3;
-  }
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Amelie Vorchheimer -- Video Work Matrix</title>
 
-  h1 {
-      font-size: 2rem;
-      color: #7400f0;
-      margin-bottom: 1rem;
-      text-shadow: 0 0 2px #9369f5;
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      font-family: 'Geo', monospace;
+      background-color: #05010c; /* Your deep dark base */
+      color: #ff0019;
+      overflow: hidden; /* Prevents scrollbars so boxes can be moved anywhere */
+      position: relative;
     }
 
-  
-  canvas {
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: -1;
-  }
-  
-  .content {
-    display: flex;
-    justify-content: space-between;
-    padding: 4rem;
-  }
-  
-  .text-column {
-    width: 35%;
-    padding-right: 2rem;
-  }
-  
-  .video-column {
-    width: 60%;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-  }
-  
-  .video-section {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .annotation {
-    background-color: #4c0771;
-    color: #efa7ff;
-    padding: 10px;
-    width: 40%;
-    box-sizing: border-box;
-  }
-  
-  .video-container {
-    width: 80%;
-  }
-  
-  .video-container video {
-    width: 100%;
-    height: auto;
-    border: 2px solid #4b1b4f;
-    border-radius: 0px;
-    box-shadow: 0 0 20px rgba(69, 5, 119, 0.3);
-  }
-  
-  .gif-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: rgba(64, 4, 90, 0.341);
-    display: flex;
-    justify-content: space-around;
-    padding: 5px 0;
-    z-index: 10;
-  }
-  
-  .gif-bar img {
-    height: 100px;
-    cursor: pointer;
-    border: 0px solid #4b1b4f;
-    transition: transform 0.2s;
-  }
-  
-  .gif-bar img:hover {
-    transform: scale(1.1);
-  }
-  
+    /* CRT scanline overlay effect to match your other pages */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+
+    /* Fixed Header Area */
+    header {
+      position: absolute;
+      top: 2rem;
+      left: 2rem;
+      z-index: 10;
+      max-width: 600px;
+      pointer-events: none; /* Let clicks pass through header background */
+    }
+
+    h1 {
+      font-size: 4.5rem;
+      margin: 0 0 0.5rem 0;
+      color: #cd0011;
+      text-shadow: 0 0 5px #ef5c6b;
+      border-bottom: 2px solid #ff0019;
+      padding-bottom: 0.3rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .caption {
+      font-size: 1.4rem;
+      line-height: 1.4;
+      text-shadow: 0 0 4px #e73b3d;
+      pointer-events: auto; /* Allow users to read/interact if needed */
+    }
+
+    /* Draggable Video Box Containers */
+    .video-box {
+      position: absolute;
+      width: 320px;
+      background: #000;
+      border: 1px solid #ff0019;
+      box-shadow: 0 0 12px rgba(255, 0, 25, 0.2);
+      z-index: 2;
+      cursor: move; /* Shows movement cursor */
+      transition: box-shadow 0.2s ease;
+    }
+
+    .video-box:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 25, 0.5);
+      border-color: #ef5c6b;
+    }
+
+    /* The handle bar at the top of each video box */
+    .video-handle {
+      background: #ff0019;
+      color: #000;
+      padding: 3px 8px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select: none;
+    }
+
+    .video-handle .status-dot {
+      width: 8px;
+      height: 8px;
+      background: #000;
+      border-radius: 50%;
+      animation: blink 1.5s steps(1) infinite;
+    }
+
+    /* Inner frame wrapping the actual video element */
+    .video-content {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #05010c;
+      display: block;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .video-info {
+      padding: 6px 10px;
+      font-size: 1.1rem;
+      border-top: 1px dashed #ff0019;
+      color: #ff0019;
+      background: #000;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    /* Bottom navigation control home button */
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      z-index: 1000;
+    }
+
+    .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 120px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover { transform: scale(1.05); }
+
+    .nav-caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
+    }
   </style>
 </head>
 <body>
 
-
-  <div class="content">
-    <div class="text-column">
-      <h1>Conceptually speaking</h1>
-      <p> let the glitches wash over you.
-        <br> 
-        <br>
-        <br>
-        This is a space where creativity and technology collide. 
-        A space where I distort information, experiences, and perception to generate
-        new layers of meaning.
-        <br>
-        <br>
-        The cloud is a space where I exist without bounds, without definition.
-        Multiplicity as a concept embodies the idea that the self is not fixed, 
-        but rather in a state of flux. I engage 
-         the power of employing online space to reject colonial structures of singularity.
-        <br>
-        <br>
-        We exist in a flux of identities and realities both AFK and digitally. 
-        Embracing these identity fluxes and encouraging existing in the in-between, 
-        through refusing categorization, am I an artist? am I coder? am I a designer? am I a computer?
-        <br><br>
-        “individual attention forms the basis for collective attention and thus for meaningful refusal of all kinds.”(Odell, 2019:75).
-         Thus, acts of refusal (being acknowledged) are contingent on a society adhering to the status quo. 
-        <br>
-        <br>
-         Acknowledge the quiet acts of acting unexpectedly as a tool to disrupt. Embrace the third space.
-         <h1>Welcome to the Third Space</h1>
-        <strong>Click on the GIFs below to navigate to different sections of my site.</strong>
-
-      </p>
+  <header>
+    <h1>Video Work</h1>
+    <div class="caption">
+      [SYSTEM_MONITOR]: Decentralized stream captures. Drag containers to reconfigure spatial feedback. The interface archives moving images tracking human-machine surveillance, identity drift, and digital intimacy.
     </div>
+  </header>
 
-    <div class="video-column">
-      <div class="video-section">
-        <div class="annotation">
-          <p><strong>Line up for tea, 2024 - </strong> This video is created from a sound analysis tool, 
-            the sounds used were recorded during disucssions hosted in 2024 that aimed to investigate methods for 
-            non-violent forms of changemaking. The video obstructs the content of the discussions as a comment on 
-        technologies ability to distrct us from critically engaging.</p>
-        </div>
-        <div class="video-container">
-            <video autoplay muted loop playsinline poster="thumbnail.jpg">
-                <source src="movieout1.mov" type="video/mp4"/>
-              </video>
-        </div>
-      </div>
-
-      <div class="video-section">
-        <div class="annotation">
-          <p><strong>3, 2024 - </strong> 3 is a similar concept to line up for tea, however, in it's generation, 
-            were 3 sperate discussions which were untited through video editing and sound 
-            analysis to once again obstruct understanding and interpretation.</p>
-        </div>
-        <div class="video-container">
-          <video autoplay muted loop playsinline>
-            <source src="3.mp4" type="video/mp4"/>
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
+  <!-- VIDEO BOX 1 -->
+  <!-- You can adjust the starting positions using style="top: ...px; left: ...px;" -->
+  <div class="video-box" style="top: 250px; left: 40px;">
+    <div class="video-handle">
+      <span>WORK_001.MP4</span>
+      <div class="status-dot"></div>
     </div>
- </div>
-      <div class="video-section">
-        <div class="annotation">
-          <p><strong>training to disengage, 2025 - </strong>drawing on memory and repetitive experience, this body of work engages with
-        productivy narratives within captilist frameworks. The narrative of the office worker, the student, who engage with reptitve acts of 
-    relocation. Thus we disengage through the interenet, and the internet becomes a stylistic refrence for thep iece, which replicates a 
-disjointed experience of transit.</p>
-       
-</div>
-        <div class="video-container">
-          <video autoplay muted loop playsinline>
-            <source src="train fin 1.mp4" type="video/mp4"/>
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-      <div class="video-section">
-        <div class="annotation">
-          <p><strong>dotted pattern 2025 - </strong> This video wa made using processing, a coding language for creativity.
-        I aim to demonstrate simple algorythmic output in a creative form. </p>
-        </div>
-        <div class="video-container">
-          <<video autoplay muted loop playsinline poster="thumbnail.jpg">
-            <source src="the dot generator.mp4" type="video/mp4"/>
-            Your browser does not support the video tag.
-          </video>
-        </div>
-      </div>
-     
-
-  <div class="gif-bar">
-    <a href="page1.html"><img src="party rage Sticker by Studios Stickers.gif" alt="GIF 1" /></a>
-    <a href="page2.html"><img src="The Simpsons Dancing Sticker.gif" alt="GIF 2" /></a>
-    <a href="page3.html"><img src="Happy Winnie The Pooh Sticker.gif" alt="GIF 3" /></a>
-    <a href="page4.html"><img src="happy cat GIF.gif" alt="GIF 4" /></a>
-    <a href="page5.html"><img src="weird video games Sticker.gif" alt="GIF 5" /></a>
-    <a href="page6.html"><img src="Party Dancing Sticker.gif" alt="GIF 6" /></a>
+    <div class="video-content">
+      <!-- Replace with your actual video paths. Loop & muted allow them to play like video art pieces -->
+      <video src="videos/presence_of_flesh.mp4" autoplay loop muted playsinline></video>
+    </div>
+    <div class="video-info">presence of YOUR cyborg flesh (2025)</div>
   </div>
+
+  <!-- VIDEO BOX 2 -->
+  <div class="video-box" style="top: 180px; left: 450px;">
+    <div class="video-handle">
+      <span>WORK_002.MP4</span>
+      <div class="status-dot"></div>
+    </div>
+    <div class="video-content">
+      <video src="videos/conductors_supervision.mp4" autoplay loop muted playsinline></video>
+    </div>
+    <div class="video-info">The Conductors Supervision (2025)</div>
+  </div>
+
+  <!-- VIDEO BOX 3 -->
+  <div class="video-box" style="top: 480px; left: 240px;">
+    <div class="video-handle">
+      <span>WORK_003.MP4</span>
+      <div class="status-dot"></div>
+    </div>
+    <div class="video-content">
+      <video src="videos/remote_attachment.mp4" autoplay loop muted playsinline></video>
+    </div>
+    <div class="video-info">Remote Attachment (2026)</div>
+  </div>
+
+
+  <!-- Return Home Button -->
+  <div class="bottom-right">
+    <a href="index.html">
+      <img src="spinning_1_1.gif" alt="Go Button" class="clickable-image">
+    </a>
+    <div class="nav-caption">home</div>
+  </div>
+
+  <!-- Draggable Engine Script -->
+  <script>
+    // Target all containers with the class 'video-box'
+    const boxes = document.querySelectorAll('.video-box');
+    let highestZ = 10; // Keep track of layering when clicked
+
+    boxes.forEach(box => {
+      const handle = box.querySelector('.video-handle');
+      let posX = 0, posY = 0, mouseX = 0, mouseY = 0;
+
+      handle.onmousedown = dragMouseDown;
+      // Also add touch support for mobile screens
+      handle.ontouchstart = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        // Bring clicked box to the top layer
+        highestZ++;
+        box.style.zIndex = highestZ;
+
+        // Extract coordinates based on event type (mouse vs touch)
+        if (e.type === 'touchstart') {
+          mouseX = e.touches[0].clientX;
+          mouseY = e.touches[0].clientY;
+          document.ontouchend = closeDragElement;
+          document.ontouchmove = elementDrag;
+        } else {
+          e.preventDefault();
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          document.onmouseup = closeDragElement;
+          document.onmousemove = elementDrag;
+        }
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        let currentX, currentY;
+
+        if (e.type === 'touchmove') {
+          currentX = e.touches[0].clientX;
+          currentY = e.touches[0].clientY;
+        } else {
+          e.preventDefault();
+          currentX = e.clientX;
+          currentY = e.clientY;
+        }
+
+        // Calculate changes in coordinates
+        posX = mouseX - currentX;
+        posY = mouseY - currentY;
+        mouseX = currentX;
+        mouseY = currentY;
+
+        // Assign new coordinates to the element container style
+        box.style.top = (box.offsetTop - posY) + "px";
+        box.style.left = (box.offsetLeft - posX) + "px";
+      }
+
+      function closeDragElement() {
+        // Disconnect listeners when click/touch releases
+        document.onmouseup = null;
+        document.onmousemove = null;
+        document.ontouchend = null;
+        document.ontouchmove = null;
+      }
+    });
+  </script>
+
 </body>
 </html>
