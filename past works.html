@@ -248,20 +248,30 @@
       padding-left: 10px;
     }
 
-    .home-btn {
-      position: fixed; bottom: 20px; right: 20px;
-      background: #ff0000; color: #000;
-      border: none; padding: 12px 24px;
-      font-family: 'Geo', sans-serif;
-      font-size: 1rem; cursor: pointer;
-      box-shadow: 0 0 15px rgba(255,0,0,0.6);
-      transition: all 0.3s;
-      z-index: 999;
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      z-index: 20;
     }
 
-    .home-btn:hover {
-      background: #cc0000;
-      box-shadow: 0 0 25px rgba(255,0,0,0.9);
+    .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
     }
 
     @media (max-width: 768px) {
@@ -687,7 +697,7 @@
       <p>Content layout documentation coming soon.</p>
     </div>
   </div>
-     <div class="home-btn">
+     <div class="bottom-right">
       <a href="open2.html">
         <img src="red house.gif" alt="Go Button" class="clickable-image">
       </a>
