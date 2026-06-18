@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HAND_TRACKER_1 - Pose Detection</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
+  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
+  <style>
+    /* ============================================
+       CUSTOMIZATION SECTION
+       ============================================ */
+    :root {
+      --tracker-color: #8e00b5;  /* Pink/Purple theme */
+      --tracker-name: "HAND_TRACKER_1";
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: var(--tracker-color);
+      overflow: hidden;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      border: 2px solid var(--tracker-color);
+      max-width: 400px;
+      font-size: 12px;
+    }
+
+    #status {
+      color: var(--tracker-color);
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .data-point {
+      font-size: 12px;
+      margin: 5px 0;
+      color: var(--tracker-color);
+    }
+
+    #poseInfo {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--tracker-color);
+    }
+
+    .pose-detected {
+      color: #0f0;
+      font-weight: bold;
+      font-size: 14px;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
+    #sendStatus {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid var(--tracker-color);
+      font-size: 11px;
+      color: #888;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <div id="status">● HAND_TRACKER_1 - ACTIVE</div>
+    <div id="data">
+      <div class="data-point">HANDS DETECTED: 0</div>
+      <div class="data-point">KEYPOINTS: 0</div>
+    </div>
+    <div id="poseInfo">
+      <div class="data-point">CURRENT POSE: None</div>
+      <div class="data-point">CONFIDENCE: 0%</div>
+      <div class="data-point">DURATION: 0.0s</div>
+    </div>
+    <div id="sendStatus">Initializing...</div>
+  </div>
+
+  <script>
+    /* ============================================
+       CONFIGURATION
+       ============================================ */
+    const CONFIG = {
+      trackerName: 'HAND_TRACKER_1',
+      channelName: 'multi_tracker',  // Same as face trackers
+      sendInterval: 2000,            // Send pose data every 2 seconds
+      poseConfidenceThreshold: 0.7,  // Minimum confidence to register pose
+      poseDurationMin: 0.5           // Minimum duration (seconds) to send
+    };
+
+    // BroadcastChannel for sending data
+    const channel = new BroadcastChannel(CONFIG.channelName);
+    let sendCount = 0;
+
+    // Hand tracking variables
+    let video;
+    let handPose;
+    let hands = [];
+    let connections;
+    let emitters = [];
+
+    // Pose detection variables
+    let currentPose = 'None';
+    let poseConfidence = 0;
+    let poseStartTime = null;
+    let poseDuration = 0;
+    let lastSentPose = null;
+
+    /* ============================================
+       PARTICLE SYSTEM CLASSES
+       ============================================ */
+    class Particle {
+      constructor(x, y) {
+        this.position = p5.Vector.random2D();
+        this.position.setMag(random(10, 50));
+        this.position.add(x, y);
+        this.acceleration = p5.Vector.random2D();
+        this.acceleration.setMag(0);
+        this.velocity = p5.Vector.random2D();
+        this.velocity.setMag(random(1, 3));
+        this.lifespan = 150.0;
+        this.icon = '✼';
+      }
+
+      run() {
+        let gravity = createVector(0, 0.2);
+        this.applyForce(gravity);
+        this.update();
+        this.show();
+      }
+
+      applyForce(force) {
+        this.acceleration.add(force);
+      }
+
+      update() {
+        this.velocity.add(this.acceleration);
+        this.position.add(this.velocity);
+        this.lifespan -= 10;
+        this.acceleration.mult(0);
+      }
+
+      show() {
+        push();
+        textSize(30);
+        textAlign(CENTER, CENTER);
+        strokeWeight(2);
+        fill(200, 10, 255, this.lifespan);
+        text(this.icon, this.position.x, this.position.y);
+        pop();
+      }
+
+      isDead() {
+        return this.lifespan < 0.0;
+      }
+    }
+
+    class Emitter {
+      constructor(x, y) {
+        this.origin = createVector(x, y);
+        this.particles = [];
+      }
+
+      addParticle() {
+        this.particles.push(new Particle(this.origin.x, this.origin.y));
+      }
+
+      run() {
+        for (let i = this.particles.length - 1; i >= 0; i--) {
+          this.particles[i].run();
+          if (this.particles[i].isDead()) {
+            this.particles.splice(i, 1);
+          }
+        }
+      }
+    }
+
+    /* ============================================
+       POSE DETECTION FUNCTIONS
+       ============================================ */
+    
+    // Calculate distance between two keypoints
+    function getDistance(kp1, kp2) {
+      return dist(kp1.x, kp1.y, kp1.z || 0, kp2.x, kp2.y, kp2.z || 0);
+    }
+
+    // Calculate angle between three points
+    function getAngle(p1, p2, p3) {
+      let v1 = createVector(p1.x - p2.x, p1.y - p2.y);
+      let v2 = createVector(p3.x - p2.x, p3.y - p2.y);
+      return abs(v1.angleBetween(v2)) * (180 / PI);
+    }
+
+    // Check if finger is extended
+    function isFingerExtended(hand, fingerTipIdx, fingerMidIdx, fingerBaseIdx) {
+      let tip = hand.keypoints[fingerTipIdx];
+      let mid = hand.keypoints[fingerMidIdx];
+      let base = hand.keypoints[fingerBaseIdx];
+      
+      let angle = getAngle(tip, mid, base);
+      return angle > 140; // Finger is straight if angle > 140°
+    }
+
+    // Detect thumbs up
+    function detectThumbsUp(hand) {
+      // Thumb extended, other fingers curled
+      let thumbExtended = hand.keypoints[4].y < hand.keypoints[3].y;
+      let indexCurled = !isFingerExtended(hand, 8, 6, 5);
+      let middleCurled = !isFingerExtended(hand, 12, 10, 9);
+      let ringCurled = !isFingerExtended(hand, 16, 14, 13);
+      let pinkyCurled = !isFingerExtended(hand, 20, 18, 17);
+      
+      return thumbExtended && indexCurled && middleCurled && ringCurled && pinkyCurled;
+    }
+
+    // Detect peace sign (V sign)
+    function detectPeaceSign(hand) {
+      let indexExtended = isFingerExtended(hand, 8, 6, 5);
+      let middleExtended = isFingerExtended(hand, 12, 10, 9);
+      let ringCurled = !isFingerExtended(hand, 16, 14, 13);
+      let pinkyCurled = !isFingerExtended(hand, 20, 18, 17);
+      
+      return indexExtended && middleExtended && ringCurled && pinkyCurled;
+    }
+
+    // Detect fist (all fingers curled)
+    function detectFist(hand) {
+      let allCurled = 
+        !isFingerExtended(hand, 8, 6, 5) &&
+        !isFingerExtended(hand, 12, 10, 9) &&
+        !isFingerExtended(hand, 16, 14, 13) &&
+        !isFingerExtended(hand, 20, 18, 17);
+      
+      return allCurled;
+    }
+
+    // Detect open hand (all fingers extended)
+    function detectOpenHand(hand) {
+      let allExtended = 
+        isFingerExtended(hand, 8, 6, 5) &&
+        isFingerExtended(hand, 12, 10, 9) &&
+        isFingerExtended(hand, 16, 14, 13) &&
+        isFingerExtended(hand, 20, 18, 17);
+      
+      return allExtended;
+    }
+
+    // Detect pinch (thumb and index finger close together)
+    function detectPinch(hand) {
+      let thumbTip = hand.keypoints[4];
+      let indexTip = hand.keypoints[8];
+      let distance = getDistance(thumbTip, indexTip);
+      
+      return distance < 30; // Pixels threshold
+    }
+
+    // Detect hands touching (when 2 hands detected and close)
+    function detectHandsConnected(hands) {
+      if (hands.length !== 2) return false;
+      
+      let hand1Center = hands[0].keypoints[9]; // Middle finger base
+      let hand2Center = hands[1].keypoints[9];
+      let distance = getDistance(hand1Center, hand2Center);
+      
+      return distance < 80; // Hands are touching
+    }
+
+    // Main pose detection
+    function detectPose() {
+      if (hands.length === 0) {
+        currentPose = 'None';
+        poseConfidence = 0;
+        return;
+      }
+
+      // Check for hands connected first (requires 2 hands)
+      if (detectHandsConnected(hands)) {
+        currentPose = 'Hands_Connected';
+        poseConfidence = 0.9;
+        return;
+      }
+
+      // Check poses on first hand
+      let hand = hands[0];
+      
+      if (detectThumbsUp(hand)) {
+        currentPose = 'Thumbs_Up';
+        poseConfidence = 0.85;
+      } else if (detectPeaceSign(hand)) {
+        currentPose = 'Peace_Sign';
+        poseConfidence = 0.85;
+      } else if (detectPinch(hand)) {
+        currentPose = 'Pinch';
+        poseConfidence = 0.8;
+      } else if (detectFist(hand)) {
+        currentPose = 'Fist';
+        poseConfidence = 0.8;
+      } else if (detectOpenHand(hand)) {
+        currentPose = 'Open_Hand';
+        poseConfidence = 0.85;
+      } else {
+        currentPose = 'None';
+        poseConfidence = 0;
+      }
+    }
+
+    // Update pose duration
+    function updatePoseDuration() {
+      if (currentPose !== 'None' && poseConfidence >= CONFIG.poseConfidenceThreshold) {
+        if (poseStartTime === null) {
+          poseStartTime = millis();
+        }
+        poseDuration = (millis() - poseStartTime) / 1000;
+      } else {
+        poseStartTime = null;
+        poseDuration = 0;
+      }
+    }
+
+    // Send pose data to feed
+    function sendPoseData() {
+      if (currentPose === 'None' || poseDuration < CONFIG.poseDurationMin) {
+        return;
+      }
+
+      // Only send if pose is different or duration updated significantly
+      if (lastSentPose === currentPose && poseDuration < 1) {
+        return;
+      }
+
+      const poseData = {
+        tracker: CONFIG.trackerName,
+        timestamp: Date.now(),
+        pose: currentPose,
+        confidence: poseConfidence,
+        duration: poseDuration,
+        handsDetected: hands.length,
+        keypoints: hands.length > 0 ? hands[0].keypoints.length : 0
+      };
+
+      channel.postMessage({
+        type: 'POSE_DATA',
+        data: poseData
+      });
+
+      sendCount++;
+      lastSentPose = currentPose;
+      
+      document.getElementById('sendStatus').innerHTML = 
+        `✓ Sent ${sendCount} poses to receiver`;
+      
+      console.log('📤 Sent pose:', poseData);
+    }
+
+    // Update UI
+    function updateUI() {
+      const dataDiv = document.getElementById('data');
+      const poseDiv = document.getElementById('poseInfo');
+      
+      dataDiv.innerHTML = `
+        <div class="data-point">HANDS DETECTED: ${hands.length}</div>
+        <div class="data-point">KEYPOINTS: ${hands.length > 0 ? hands[0].keypoints.length * hands.length : 0}</div>
+      `;
+
+      const poseClass = currentPose !== 'None' ? 'pose-detected' : '';
+      poseDiv.innerHTML = `
+        <div class="data-point ${poseClass}">CURRENT POSE: ${currentPose.replace(/_/g, ' ')}</div>
+        <div class="data-point">CONFIDENCE: ${(poseConfidence * 100).toFixed(0)}%</div>
+        <div class="data-point">DURATION: ${poseDuration.toFixed(1)}s</div>
+      `;
+    }
+
+    /* ============================================
+       P5.JS SETUP AND DRAW
+       ============================================ */
+    
+    function gotHands(results) {
+      hands = results;
+    }
+
+    function preload() {
+      handPose = ml5.handPose();
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      video = createCapture(VIDEO);
+      video.size(windowWidth, windowHeight);
+      video.hide();
+
+      handPose.detectStart(video, gotHands);
+      connections = handPose.getConnections();
+
+      // Create 42 particle emitters (21 keypoints × 2 hands)
+      for (let i = 0; i < 21 * 2; i++) {
+        emitters.push(new Emitter(width / 2, height / 2));
+      }
+
+      console.log('🎥 HAND_TRACKER_1 initialized');
+    }
+
+    function draw() {
+      clear();
+      image(video, 0, 0, width, height);
+      blendMode(ADD);
+
+      // 1. Draw hand skeletons
+      for (let i = 0; i < hands.length; i++) {
+        let hand = hands[i];
+        
+        // Draw connections
+        for (let j = 0; j < connections.length; j++) {
+          let pointAIndex = connections[j][0];
+          let pointBIndex = connections[j][1];
+          let pointA = hand.keypoints[pointAIndex];
+          let pointB = hand.keypoints[pointBIndex];
+          
+          stroke(200, 0, 150); // Pink/purple skeleton
+          strokeWeight(4);
+          line(pointA.x, pointA.y, pointB.x, pointB.y);
+        }
+
+        // Draw keypoints
+        for (let keypoint of hand.keypoints) {
+          fill(200, 10, 255);
+          noStroke();
+          circle(keypoint.x, keypoint.y, 8);
+        }
+      }
+
+      // 2. Update particle emitters
+      if (hands.length > 0) {
+        let counter = 0;
+
+        for (let hand of hands) {
+          for (let i = 0; i < hand.keypoints.length; i++) {
+            let keypoint = hand.keypoints[i];
+            let emitter = emitters[counter];
+            
+            emitter.origin.x = keypoint.x;
+            emitter.origin.y = keypoint.y;
+            emitter.addParticle();
+            
+            counter++;
+          }
+        }
+      }
+
+      // 3. Run all emitters
+      for (let emitter of emitters) {
+        emitter.run();
+      }
+
+      blendMode(BLEND);
+
+      // 4. Detect poses and update UI
+      detectPose();
+      updatePoseDuration();
+      updateUI();
+    }
+
+    // Send data at intervals
+    setInterval(() => {
+      sendPoseData();
+    }, CONFIG.sendInterval);
+  </script>
+</body>
+</html>
