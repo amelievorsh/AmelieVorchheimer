@@ -27,7 +27,7 @@
     /* Cyberpunk Grid Grid Configurations */
     .container {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
       gap: 25px;
       padding: 20px;
     }
@@ -42,145 +42,35 @@
       min-height: 300px;
       overflow: hidden;
     }
+
+            .sketch-container {
+      display: flex;
+      justify-content: center; /* Center the sketch horizontally */
+      align-items: flex-end; /* Align to the bottom of the container */
+      width: 100%;
+      flex-grow: 1; /* Allows the sketch container to take up available space */
+      padding-top: 2rem; /* Add some space above the sketch */
+    }
+
+    .sketch-container canvas {
+      max-width: 100%; /* Ensure the canvas is responsive */
+      height: auto; /* Maintain aspect ratio */
+      display: block; /* Remove extra space below the canvas */
+    }
+
        </style>  
   </head>
 
   <body>
     <div class="container">
  <div class="grid-item">
-     <script>//Frequency Selector - part of ongoing webdevelopment project 
-
-let midpoint = 200;
-
-let osc, fft;
-
-let slider;
-let textBox;
-
-function setup() {
-  createCanvas(600, 250);
-  
-  slider = createSlider(100, 600, 100, 1);
-  slider.position(220, 50);
-  
-  textBox = createInput(slider.value().toString());
-  textBox.hide();
-  //textBox.position(30, 300);
-  //textBox.size(50);
-
-  osc = new p5.SinOsc; // set frequency and type
-  osc.amp(0.9);
-
-  fft = new p5.FFT();
-  osc.start();
-}
-
-function draw() {
-  background(25);
-  
-  let fre = slider.value();
-  
-  textBox.value(fre);
-
-  fill(150,30,200);
-  noStroke();
-  textSize(30);
-  
-  text("Frequency: " + fre, width/3, 40);
-
-
-  let wavform = fft.waveform(); // analyze the waveform
-  beginShape();
-  strokeWeight(3);
-  stroke(200,20,180);
-  noFill();
-  for (let i = 0; i < wavform.length; i++) {
-    let x = map(i, 0, wavform.length, 0, width);
-    let y = map(wavform[i], -1, 1, height, 0);
-    vertex(x, y);
-    
-  }
-  endShape();
-
-
-  // change oscillator frequency based on mouseX
-  let fren = fre;
-  osc.freq(fren);
-
-  let amp = (0.2, 0.8, 0.7);
-  osc.amp(amp);
-}
-
-new p5(sketch1, 'sketch-holder-1');  </script>
-     
-</div>
-      <div class="grid-item"> <script> // face mesh triangles - created as a responsive artwork 
-
-// Face Mesh Detection - Animate only keypoint A using sin()
-let video;
-let faceMesh;
-let faces = [];
-let triangles;
-let t = 0; // time variable
-
-function preload() {
-  faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
-}
-
-function gotFaces(results) {
-  faces = results;
-}
-
-function setup() {
-  createCanvas(windowWidth, windowHeight);
-  video = createCapture(VIDEO, { flipped: true });
-  video.hide();
-
-  faceMesh.detectStart(video, gotFaces);
-  triangles = faceMesh.getTriangles();
-}
-
-function draw() {
-  background(0);
-  video.loadPixels();
-
-  if (faces.length > 0) {
-    let face = faces[0];
-
-    beginShape(TRIANGLES);
-    noFill();
-    stroke(150, 25, 150, 180);
-    strokeWeight(2);
-
-    for (let i = 0; i < triangles.length; i++) {
-      let tri = triangles[i];
-      let [a, b, c] = tri;
-
-      // Animate only keypoint A using sin()
-      let pointA = face.keypoints[a];
-      let pointB = face.keypoints[b]*PI;
-      let pointC = face.keypoints[c];
-
-      // Apply motion only to A
-      let amp = 9;     // amplitude of movement
-      let freq = 0.7;  // frequency of oscillation
-      let ax = pointA.x + sin(t + i * freq) * amp/PI;
-      let ay = pointA.y // cos(t + i * freq) * amp;
-
-      // Draw triangle
-      vertex(ax, ay);
-      vertex(pointB.x, pointB.y);
-      vertex(pointC.x, pointC.y);
-    }
-
-    endShape();
-    t += 0.03; // advance time
-  }
-}
-      </script>
-      
-      </div>
-     
+    <div class="sketch-container" id="sketch-container">
+    </div>
+ <script src="sketch1.js"></script>   
+  <div class="sketch-container" id="sketch-container">
+    </div>
+ <script src="sketch2.js"></script>   
+   
     </div>
     
     <script src="sketch1.js"></script>
