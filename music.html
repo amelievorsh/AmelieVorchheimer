@@ -1,1 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Amelie Vorchheimer -- A \/oid</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      font-family: 'Geo', monospace;
+      background-color: #383838;
+      color: #ff0019;
+      overflow-x: hidden; /* prevent horizontal scroll */
+      overflow-y: auto;
+      line-height: 1.5;
+    }
+
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+      z-index: 999;
+      background-size: 100% 4px, 6px 100%;
+      pointer-events: none;
+    }
+    
+    #overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: flex-start;
+      background: transparent;
+      padding: 2rem 1rem;
+      box-sizing: border-box;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-attachment: fixed;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .top-left {
+      font-size: 5rem;
+      color: #cd0011;
+      text-shadow: 0 0 5px #ef5c6b;
+      margin-bottom: 2rem;
+    }
+
+    section {
+      width: 100%;
+      max-width: 900px;
+      margin-bottom: 2rem;
+    }
+
+    hr {
+      border: none;
+      height: 2px;
+      background-color: red;
+      width: 100%; 
+      margin: 1rem 0;
+    }
+
+    /* --- Accordion Outline Styling --- */
+    .accordion {
+      background-color: transparent;
+      color: #ff0019;
+      cursor: pointer;
+      padding: 1rem 1.1rem;
+      width: 100%;
+      text-align: left;
+      border: 2px solid #ff0019;
+      outline: none;
+      font-family: 'Geo', monospace;
+      font-size: 2.2rem;
+      text-shadow: 0 0 3px #e73b3d;
+      box-shadow: 0 0 5px rgba(255, 0, 25, 0.2);
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between; /* Keeps text left, GIF right */
+    }
+
+    /* Change to solid red fill with black text on active/hover states */
+    .active, .accordion:hover {
+      background-color: #ff0019;
+      color: black;
+      text-shadow: none;
+      box-shadow: 0 0 15px rgba(255, 0, 25, 0.6);
+    }
+
+    /* Styled slot for standard title images/Gifs */
+    .accordion-gif {
+      height: 50px;
+      width: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Panel Content Styling */
+    .panel {
+      padding: 1rem 18px 0 18px;
+      background-color: transparent;
+      display: none;
+      overflow: hidden;
+      border-left: 2px dashed #ff0019;
+      border-right: 2px dashed #ff0019;
+      border-bottom: 2px dashed #ff0019;
+    }
+
+    h2 {
+      font-size: 2.5rem;
+      text-shadow: 0 0 3px #e73b3d;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    h3 {
+      font-size: 2.2rem;
+      margin-left: 30px;
+      margin-top: 1.5rem;
+      text-shadow: 0 0 3px #e73b3d;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.5rem;
+      margin-left: 60px;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 4px #e73b3d;
+    }
+
+    .bottom-right {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      z-index: 20;
+    }
+
+    .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0.4; }
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .top-left { font-size: 3.5rem; }
+      .accordion { font-size: 2.3rem; }
+      h2 { font-size: 2.5rem; }
+      h3 { font-size: 2.2rem; margin-left: 20px; }
+      p { font-size: 1.3rem; margin-left: 40px; }
+      .clickable-image { width: 120px; }
+    }
+
+    @media (max-width: 768px) {
+      .top-left { font-size: 2.8rem; }
+      .accordion { font-size: 2rem; }
+      h2 { font-size: 2rem; }
+      h3 { font-size: 1.8rem; margin-left: 15px; }
+      p { font-size: 1.2rem; margin-left: 30px; }
+      .clickable-image { width: 100px; }
+      .accordion-gif { height: 40px; }
+    }
+
+    @media (max-width: 480px) {
+      .top-left { font-size: 2em; text-align: center; margin-bottom: 1.5rem; }
+      section { margin-left: 0; padding: 0 1rem; }
+      .accordion { font-size: 1.6rem; padding: 0.8rem 1rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.2rem; margin-left: 0; }
+      p { font-size: 1rem; margin-left: 0; }
+      .bottom-right { bottom: 10px; right: 10px; }
+      .clickable-image { width: 90px; }
+      .accordion-gif { height: 30px; }
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.1/addons/p5.sound.min.js"></script>
+  <script src="spiral2.js"></script>
+</head>
+<body>
+  <div id="overlay">
+    <div class="top-left">Amelie Vorchheimer</div>
+
+    <div class="h2">Links --> </div>
+
+<p>
+ <a href="https://www.goodreads.com/book/show/42771901-how-to-do-nothing" target="_blank" rel="noopener noreferrer">how to do nothing</a><br>
+    <a href="https://legacyrussell.com/GLITCHFEMINISM" target="_blank" rel="noopener noreferrer">glitch feminism</a><br>
+    <a href="https://www.taylorfrancis.com/..." target="_blank" rel="noopener noreferrer">Sampling Sexuality</a><br> 
+</p>
+    <div class="bottom-right">
+      <a href="Index page 1.html">
+        <img src="Artificial Intelligence Happy Dance Sticker by achorao_com.gif" alt="Go Button" class="clickable-image">
+      </a>
+      <div class="caption">home</div>
+    </div>
+  </div>
+</body>
+</html>
