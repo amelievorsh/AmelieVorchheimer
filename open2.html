@@ -1,508 +1,444 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Amelie's World - Terminal Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
-  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
-  
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    html, body {
-      background-color: #05010c;
-      color: #ff0033;
-      font-family: 'Geo', monospace;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
+<title>Amelie Vorchheimer</title>
 
-    body {
-      display: flex;
-      justify-content: center;
-      cursor: crosshair;
-    }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geo&display=swap" rel="stylesheet">
 
-    /* Ambient scanline distortion texture layer overlay */
-    body::before {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      z-index: 999;
-      background-size: 100% 4px, 6px 100%;
-      pointer-events: none;
-    }
+<script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+      <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
 
-    #sketch-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
+<style>
+.body{
+margin:0;
+  overflow:hidden;
+  font-family:'Geo',sans-serif;
+  background:black;
+}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    /* Draggable Main Frame Window Container */
-    #face-mesh-emulator {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #000000;
-      border: 3px solid #ff0033;
-      padding: 45px 15px 15px 15px;
-      box-shadow: 0px 0px 30px rgba(255, 0, 51, 0.4);
-      z-index: 5;
-      pointer-events: auto;
-      cursor: move;
-    }
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:black;
+  font-family:'Geo',sans-serif;
+}
 
-    /* System Control Header Styling */
-    #face-mesh-emulator::before {
-      content: "■ hello gorgeous // Click facial points to navigate pathway";
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      font-size: 1.4rem;
-      color: #00ff66;
-      text-shadow: 0 0 5px rgba(0, 255, 102, 0.8);
-      letter-spacing: 1px;
-    }
+/* ---------- P5 BACKGROUND ---------- */
 
-    #title {
-      position: fixed;
-      left: 40px;
-      top: 30px;
-      font-size: 6rem;
-      color: #680e6d;
-      letter-spacing: 3px;
-      text-shadow: 0 0 10px #730099;
-      z-index: 10;
-      text-transform: uppercase;
-    }
+#sketch-container{
+  position:fixed;
+  inset:0;
+  z-index:1;
+}
 
-    /* Side Column Navigation Layout Panels */
-    .lefttable, .righttable {
-      position: fixed;
-      top: 150px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
+/* ---------- CRT ---------- */
 
-    .lefttable { left: 40px; }
-    .righttable { right: 40px; }
+body::after{
 
-    .menu-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(10, 2, 20, 0.6);
-      border: 1px dashed #ff0033;
-      padding: 12px;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
+  content:"";
 
-    .menu-item:hover {
-      background: #ff0033;
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #ff0033;
-    }
+  position:fixed;
+  inset:0;
 
-    .menu-item:hover .folder-name {
-      color: #000;
-      text-shadow: none;
-    }
+  pointer-events:none;
 
-    .folder-icon {
-      width: 60px;
-      height: 45px;
-      background: #ff0033;
-      clip-path: polygon(0% 15%, 35% 15%, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
-      margin-bottom: 8px;
-    }
+  z-index:999;
 
-    .menu-item:hover .folder-icon {
-      background: #000;
-    }
+  background:
+  repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,.03) 3px
+  );
+}
 
-    .folder-name {
-      color: #ff0033;
-      font-size: 1.3rem;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(255, 0, 51, 0.6);
-    }
+/* ---------- TITLE ---------- */
 
-    /* Navigational Media Link Objects */
-    .media-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: rgba(0,0,0,0.8);
-      border: 1px solid #00ff66;
-      padding: 10px;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-    }
+#title-container{
 
-    .clickable-image {
-      border: 0;
-      width: 100px;
-      height: 100px;
-      object-fit: contain;
-      transition: transform 0.3s ease;
-    }
+  position:absolute;
 
-    .media-card:hover .clickable-image {
-      transform: scale(1.1) rotate(2deg);
-    }
+  top:8%;
 
-    .caption {
-      font-size: 1.1rem;
-      color: #00ff66;
-      margin-top: 6px;
-      text-shadow: 0 0 5px rgba(0,255,102,0.5);
-    }
+  left:50%;
 
-    /* Interactive Alert Box Terminal */
-    .alert-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #000;
-      border: 2px solid #00ff66;
-      padding: 25px;
-      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
-      z-index: 2000;
-      display: block;
-      text-align: center;
-      width: 420px;
-      max-width: 85%;
-    }
+  transform:translateX(-50%);
 
-    .alert-box p {
-      margin: 0 0 20px 0;
-      font-size: 1.8rem;
-      line-height: 1.3;
-      color: #00ff66;
-    }
+  text-align:center;
 
-    .alert-box button {
-      background-color: transparent;
-      color: #00ff66;
-      border: 1px solid #00ff66;
-      padding: 8px 20px;
-      font-family: 'Geo', monospace;
-      font-size: 1.4rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+  z-index:20;
+}
 
-    .alert-box button:hover {
-      background-color: #00ff66;
-      color: #000;
-    }
+h1{
 
-    /* Screen Breakpoint Responsive Adjustments */
-    @media (max-width: 1024px) {
-      #title { font-size: 3.5rem; left: 20px; top: 15px; }
-      .lefttable, .righttable { top: auto; bottom: 20px; flex-direction: row; gap: 15px; }
-      .lefttable { left: 20px; }
-      .righttable { right: 20px; }
-      #face-mesh-emulator { width: 95vw; height: auto; max-width: 640px; }
-    }
+  font-size:6rem;
 
-    @media (max-width: 640px) {
-      #title { font-size: 2.5rem; width: 100%; text-align: center; left: 0; }
-      .lefttable { display: none; } /* Hide technical tables on compact mobiles to avoid overlap */
-      .righttable { left: 50%; right: auto; transform: translateX(-50%); bottom: 15px; width: max-content; }
-      .media-card { padding: 6px; }
-      .clickable-image { width: 70px; height: 70px; }
-    }
-  </style>
+  color:#6f45d9;
+
+  font-weight:normal;
+
+  text-shadow:
+  0 0 15px rgba(111,69,217,.5);
+}
+
+h2{
+
+  font-size:2rem;
+
+  font-weight:normal;
+
+  color:#6f45d9;
+}
+
+/* ---------- LINES ---------- */
+
+.line{
+
+  position:absolute;
+
+  height:2px;
+
+  background:rgba(111,69,217,.45);
+
+  z-index:15;
+}
+
+.line1{
+
+  width:260px;
+
+  top:18%;
+
+  left:50%;
+
+  transform:rotate(-45deg);
+}
+
+.line2{
+
+  width:420px;
+
+  top:18%;
+
+  left:58%;
+
+  transform:rotate(-72deg);
+}
+
+/* ---------- MAIN PORTAL ---------- */
+
+#portal{
+
+  position:absolute;
+
+  left:50%;
+
+  top:55%;
+
+  transform:translate(-50%,-50%);
+
+  z-index:20;
+
+  padding:15px;
+
+  border:1px dashed rgba(111,69,217,.4);
+
+  background:rgba(0,0,0,.25);
+
+  backdrop-filter:blur(4px);
+}
+      
+#portal video{
+
+width:min(800px,60vw);
+
+height:auto;
+
+max-height:70vh;
+
+object-fit:contain;
+
+transition:.4s;
+
+  filter:
+  drop-shadow(0 0 15px rgba(111,69,217,.4));
+
+}
+
+#portal:hover img{
+
+  transform:scale(0.8);
+}
+
+      #portal span{
+padding-left: 1rem;
+color:#6f45d9;
+font-family: 'Geo', sans-serif;
+font-size:1.3rem;
+display:flex;
+white-space:normal;
+overflow-wrap:break-word;
+max-width:120px;
+}
+
+
+/* ---------- GIF BUTTONS ---------- */
+
+.navgif{
+
+  position:absolute;
+
+  z-index:25;
+}
+
+.navgif img{
+
+  width:120px;
+
+  border:none;
+
+  background:none;
+
+  transition:.3s;
+
+  filter:
+  drop-shadow(0 0 8px rgba(111,69,217,.4));
+}
+
+.navgif:hover img{
+
+  transform:scale(1.15);
+
+  filter:
+  drop-shadow(0 0 15px #6f45d9);
+}
+
+/* positions */
+
+.gif1{
+  left:18%;
+  top:42%;
+}
+
+.gif2{
+  left:25%;
+  top:70%;
+}
+
+.gif3{
+  right:20%;
+  top:72%;
+}
+
+.gif4{
+  right:12%;
+  top:52%;
+}
+
+/* ---------- TICKER ---------- */
+
+#ticker{
+
+  position:fixed;
+
+  bottom:0;
+
+  left:0;
+
+  width:100%;
+
+  height:3.5rem;
+
+  background:black;
+
+  border-top:0.1rem dashed #6f45d9;
+
+  overflow:hidden;
+
+  z-index:100;
+}
+
+#tickerText{
+
+  position:absolute;
+
+  white-space:nowrap;
+
+  color:#6f45d9;
+
+  line-height:3.5rem;
+
+  animation:scrollText 45s linear infinite;
+}
+
+@keyframes scrollText{
+
+  from{
+    transform:translateX(100%);
+  }
+
+  to{
+    transform:translateX(-100%);
+  }
+}
+
+@media(max-width:900px){
+
+  h1{
+    font-size:3.5rem;
+  }
+
+  h2{
+    font-size:1.3rem;
+  }
+
+  #portal img{
+    width:90vw;
+  }
+
+  .navgif img{
+    width:80px;
+  }
+}
+
+</style>
 </head>
 
 <body>
 
-  <div id="title">Amelie Vorchheimer</div>
-    
+<div id="sketch-container"></div>
 
-  <div class="lefttable">
-    <div class="menu-item" onclick="window.location.href='music.html'">
-      <div class="folder-icon"></div>
-      <div class="folder-name">Music</div>
-    </div>
-    <div class="menu-item" onclick="window.location.href='p5collection.html'">
-      <div class="folder-icon"></div>
-      <div class="folder-name">p5.js Projects</div>
-    </div>
+<div id="title-container">
+
+  <h1>Amelie Vorchheimer</h1>
+
+    <h2>artist • researcher • professional glitch generator
+  <br> a bug in the system </h2>
+</div>
+
+<div class="line line1"></div>
+<div class="line line2"></div>
+
+
+<a href="index2.html" id="portal">
+      <span>access video archive</span>
+    <video src="Untitled (5).mp4" autoplay loop muted playsinline></video>
+</a>
+
+<a href="music.html" class="navgif gif1">
+  <img src="musicpix1.gif" alt="">
+</a>
+
+<a href="aboutme3.html" class="navgif gif2">
+  <img src="eye1.gif" alt="">
+</a>
+
+<a href="past works.html" class="navgif gif3">
+  <img src="star1.gif" alt="">
+</a>
+
+<a href="p5collection.html" class="navgif gif4">
+  <img src="Pixel Emoji1.gif" alt="">
+</a>
+
+<div id="ticker">
+
+  <div id="tickerText">
+
+    I acknowledge the Traditional Custodians of the land on which this work is created and presented. I pay my respects to Elders past and present and extend that respect to all Aboriginal and Torres Strait Islander peoples.
+
   </div>
 
-  <div class="alert-box" id="myAlertBox">
-    <p>> INITIALIZING BIOMETRIC FEED...<br>> CALIBRATING FACE MESH EMULATOR...</p>
-    <button onclick="document.getElementById('myAlertBox').style.display='none'">ACCESS PORTAL</button>
-  </div>
+</div>
 
-  <div id="sketch-container"></div>
+<script>
 
-<script> 
-  // Connected Routing Targets for Webcam Hotspots
-  const LINK_LEFT_EYE = 'aboutme3.html';   
-  const LINK_RIGHT_EYE = 'past works.html';  
-  const LINK_MOUTH = 'index2.html';      
-  
-  let winWidth = 640;
-  let winHeight = 480;
-  let video;
-  let faceMesh;
-  let faces = [];
-  let triangles;
-  let t = 0; 
-  let displaceColors;
-  let canvas;
+let turtleX;
+let turtleY;
+let turtleHeading = 0;
+let osc;
 
-  // Interaction vectors matching running draw loops
-  let btnLeft = { x: 0, y: 0, rad: 25, hovered: false };
-  let btnRight = { x: 0, y: 0, rad: 25, hovered: false };
-  let btnMouth = { x: 0, y: 0, rad: 25, hovered: false };
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  turtleX = width / 2;
+  turtleY = height / 2;
+  background(6);
 
-  // Draggable Window Variables
-  let emuDiv;
-  let isDragging = false;
-  let dragStartX, dragStartY;
-  let winLeft, winTop;
+  osc = new p5.Oscillator('sine');
+  osc.amp(1);
+  osc.start();
 
-  // GLSL Shader configuration for the Glitch Chromatic Aberration
-  let displaceColorsSrc = `
-  precision highp float;
-  uniform sampler2D tex0;
-  varying vec2 vTexCoord;
+  frameRate(65);
+}
 
-  vec2 zoom(vec2 coord, float amount) {
-    vec2 relativeToCenter = coord - 0.5;
-    relativeToCenter /= amount;
-    return relativeToCenter + 0.5;
+function draw() {
+  let noteFreq = random(1000 / 6 * 3);
+  osc.freq(noteFreq);
+  stroke(random(250), random(26), random(200));
+
+  rotateTurtle(random(500));
+  let length = random(20);
+
+  forward(length);
+  rotateTurtle(20 / noteFreq);
+
+  forward(length);
+  rotateTurtle(60 * noteFreq / 10);
+
+  forward(length);
+  rotateTurtle(80 * noteFreq);
+
+  forward(length);
+}
+
+function forward(amount) {
+  let newX = turtleX + cos(radians(turtleHeading)) * amount;
+  let newY = turtleY + sin(radians(turtleHeading)) * amount;
+
+  line(turtleX, turtleY, newX, newY);
+  fill(10);
+
+  turtleX = newX;
+  turtleY = newY;
+
+  // Boundary check and wrapping logic
+  if (turtleX < 0) {
+    turtleX = width;
   }
-
-  void main() {
-    gl_FragColor = vec4(
-      texture2D(tex0, vTexCoord).r,
-      texture2D(tex0, zoom(vTexCoord, 1.06)).g,
-      texture2D(tex0, zoom(vTexCoord, 1.02)).b,
-      texture2D(tex0, vTexCoord).a
-    );
+  if (turtleX > width) {
+    turtleX = 0;
   }
-  `;
-
-  function preload() {
-    faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
+  if (turtleY < 0) {
+    turtleY = height;
   }
-
-  function gotFaces(results) {
-    faces = results;
+  if (turtleY > height) {
+    turtleY = 0;
   }
+}
 
-  function setup() {
-    // Generate parent moveable Window box wrapper
-    emuDiv = select("#face-mesh-emulator");
-    if(!emuDiv) {
-      emuDiv = createDiv();
-      emuDiv.id("face-mesh-emulator");
-    }
-    emuDiv.parent("sketch-container");
+function rotateTurtle(degrees) {
+  turtleHeading += degrees;
+}
+  function windowResized(){
 
-    // Dynamic central screen initialization calculation
-    winLeft = window.innerWidth / 2;
-    winTop = window.innerHeight / 2;
-    emuDiv.position(winLeft, winTop);
+  resizeCanvas(
+    windowWidth,
+    windowHeight
+  );
+}
 
-    // Structural window movement event execution mappings
-    emuDiv.elt.addEventListener('mousedown', startDrag);
-    window.addEventListener('mousemove', dragWindow);
-    window.addEventListener('mouseup', stopDrag);
-
-    // Canvas construction configuration setup
-    canvas = createCanvas(winWidth, winHeight);
-    canvas.parent(emuDiv);
-    canvas.style('display', 'block');
-    canvas.style('z-index', '2');
-
-    video = createCapture(VIDEO, { flipped: true });
-    video.size(winWidth, winHeight);
-    video.hide();
-    
-    displaceColors = createFilterShader(displaceColorsSrc);
-    faceMesh.detectStart(video, gotFaces);
-    triangles = faceMesh.getTriangles();
-  }  
-
-  function draw() {
-    background(0);
-    if (video.loadedmetadata) {
-      image(video, 0, 0, winWidth, winHeight);
-    }
-    
-    filter(THRESHOLD, 0.35);
-    filter(INVERT);
-    filter(displaceColors);
-
-    if (faces.length > 0) {
-      let face = faces[0];
-
-      beginShape(TRIANGLES);
-      noFill();
-      stroke(255, 0, 51, 90); /* Glowing cyber-crimson net matrix lines */
-      strokeWeight(1);
-
-      for (let i = 0; i < triangles.length; i++) {
-        let tri = triangles[i];
-        let [a, b, c] = tri;
-
-        let pointA = face.keypoints[a];
-        let pointB = face.keypoints[b];
-        let pointC = face.keypoints[c];
-
-        let amp = 8;     
-        let freq = 0.5;  
-        let ax = pointA.x + sin(t + i * freq) * amp / PI;
-        let ay = pointA.y;
-
-        vertex(ax, ay);
-        vertex(pointB.x, pointB.y);
-        vertex(pointC.x, pointC.y);
-      }
-      endShape();
-      t += 0.04; 
-    }
-     
-    for (const face of faces){
-      let leftEye = face.leftEye;
-      let rightEye = face.rightEye;
-      let lips = face.lips;
-        
-      // Offset calculation alignments
-      let LIx = leftEye.centerX + 40;
-      let LIy = leftEye.centerY - 40;
-
-      let Rx = rightEye.centerX - 160;
-      let Ry = rightEye.centerY - 40;
-
-      let Mx = lips.centerX - 60;
-      let My = lips.centerY + 50;
-
-      // Coordinate matching conversions
-      btnLeft.x = LIx + 15;  btnLeft.y = LIy + 10;
-      btnRight.x = Rx + 25;  btnRight.y = Ry + 10;
-      btnMouth.x = Mx - 10;  btnMouth.y = My - 10;
-
-      // Track hovering updates relative to coordinates within the container canvas view bounds
-      btnLeft.hovered = dist(mouseX, mouseY, btnLeft.x, btnLeft.y) < btnLeft.rad;
-      btnRight.hovered = dist(mouseX, mouseY, btnRight.x, btnRight.y) < btnRight.rad;
-      btnMouth.hovered = dist(mouseX, mouseY, btnMouth.x, btnMouth.y) < btnMouth.rad;
-
-      // Target system connector tracks
-      strokeWeight(1);
-      stroke(0, 255, 102, 180);
-      line(leftEye.centerX, leftEye.centerY, btnLeft.x, btnLeft.y);
-      line(rightEye.centerX, rightEye.centerY, btnRight.x, btnRight.y);
-      line(lips.centerX, lips.centerY, btnMouth.x, btnMouth.y);
-        
-      // Text generation layouts
-      textFont('Geo');
-      textSize(32);
-      noStroke();
-      
-      fill(btnLeft.hovered ? '#ff0033' : '#00ff66');
-      text("// ACCESS_ABOUT", LIx, LIy);
-
-      fill(btnRight.hovered ? '#ff0033' : '#00ff66');
-      text("// VIEW_PORTFOLIO", Rx - 20, Ry);
-
-      fill(btnMouth.hovered ? '#ff0033' : '#00ff66');
-      text("// LOAD_VIDEOS", Mx, My);
-
-      // Track Point Target Nodes Visual Display
-      strokeWeight(btnLeft.hovered ? 14 : 8);
-      stroke(255, 0, 51);
-      point(btnLeft.x, btnLeft.y);
-
-      strokeWeight(btnRight.hovered ? 14 : 8);
-      stroke(255, 0, 51);
-      point(btnRight.x, btnRight.y);
-
-      strokeWeight(btnMouth.hovered ? 14 : 8);
-      stroke(255, 0, 51);
-      point(btnMouth.x, btnMouth.y);
-    } 
-  }
-
-  // Handle route switching selections securely
-  function mousePressed() {
-    if (!isDragging) {
-      if (btnLeft.hovered) {
-        window.location.href = LINK_LEFT_EYE;
-      } else if (btnRight.hovered) {
-        window.location.href = LINK_RIGHT_EYE;
-      } else if (btnMouth.hovered) {
-        window.location.href = LINK_MOUTH;
-      }
-    }
-  }
-
-  // Window drag execution control structures
-  function startDrag(e) {
-    if (mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) return;
-    
-    isDragging = true;
-    let style = window.getComputedStyle(emuDiv.elt);
-    let matrix = new WebKitCSSMatrix(style.transform);
-    
-    // Account for the baseline CSS layout center point translation offset
-    dragStartX = e.clientX - matrix.m41;
-    dragStartY = e.clientY - matrix.m42;
-  }
-
-  function dragWindow(e) {
-    if (!isDragging) return;
-    let newX = e.clientX - dragStartX;
-    let newY = e.clientY - dragStartY;
-    
-    // Retain translate state parameters to keep mouse sync matching cleanly
-    emuDiv.style('transform', `translate(${newX}px, ${newY}px)`);
-  }
-
-  function stopDrag() {
-    isDragging = false;
-  }
-
-  // Dynamically reset window bounds parameters if view scaling layout adjusts
-  function windowResized() {
-    winLeft = window.innerWidth / 2;
-    winTop = window.innerHeight / 2;
-    if(!isDragging) {
-      emuDiv.position(winLeft, winTop);
-      emuDiv.style('transform', 'translate(-50%, -50%)');
-    }
-  }
 </script>
-    
-</body> 
+
+</body>
 </html>
