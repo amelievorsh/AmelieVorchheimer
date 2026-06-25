@@ -14,277 +14,262 @@
   <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
   
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+ body{
+  margin:0;
+  overflow:hidden;
+  font-family:'Geo',sans-serif;
+  background:black;
+}
 
-    html, body {
-      background-color: #05010c;
-      color: #ff0033;
-      font-family: 'Geo', monospace;
-      height: 100%;
-      width: 100%;
-      overflow: hidden;
-    }
+#sketch-container{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
 
-    body {
-      display: flex;
-      justify-content: center;
-      cursor: crosshair;
-    }
+.desktop{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  z-index:10;
+}
 
-    /* Ambient scanline distortion texture layer overlay */
-    body::before {
-      content: " ";
-      display: block;
-      position: fixed;
-      top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 40%, rgba(0, 0, 0, 0.25) 40%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-      z-index: 999;
-      background-size: 100% 4px, 6px 100%;
-      pointer-events: none;
-    }
-
-    #sketch-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    /* Draggable Main Frame Window Container */
-    #face-mesh-emulator {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #000000;
-      border: 3px solid #ff0033;
-      padding: 45px 15px 15px 15px;
-      box-shadow: 0px 0px 30px rgba(255, 0, 51, 0.4);
-      z-index: 5;
-      pointer-events: auto;
-      cursor: move;
-    }
-
-    /* System Control Header Styling */
-    #face-mesh-emulator::before {
-      content: "■ hello gorgeous // Click facial points to navigate pathway";
-      position: absolute;
-      top: 10px;
-      left: 15px;
-      font-size: 1.4rem;
-      color: #00ff66;
-      text-shadow: 0 0 5px rgba(0, 255, 102, 0.8);
-      letter-spacing: 1px;
-    }
-
-    #title {
-      position: fixed;
-      left: 40px;
-      top: 30px;
-      font-size: 6rem;
+#title{
+  position:absolute;
+  top:30px;
+  left:50%;
+  transform:translateX(-50%);
+  font-size: 6rem;
       color: #680e6d;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       text-shadow: 0 0 10px #730099;
       z-index: 10;
       text-transform: uppercase;
-    }
+  z-index:100;
+  text-shadow:0 0 20px rgba(197, 27, 166, 0.648);
+}
 
-    /* Side Column Navigation Layout Panels */
-    .lefttable, .righttable {
-      position: fixed;
-      top: 150px;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 25px;
-    }
+.window{
+  position:absolute;
+  width:260px;
+  text-decoration:none;
+  color:white;
 
-    .lefttable { left: 5rem; }
-    .righttable { right: 5rem; }
+  background:rgba(255,255,255,.08);
 
-    .menu-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      background: rgba(10, 2, 20, 0.6);
-      border: 1px dashed #ff0033;
-      padding: 12px;
-      transition: all 0.3s;
-      cursor: pointer;
-    }
+  backdrop-filter:blur(12px);
 
-    .menu-item:hover {
-      background: #ff0033;
-      transform: scale(1.05);
-      box-shadow: 0 0 15px #ff0033;
-    }
+  border: 2px dashed #680e6d;
 
-    .menu-item:hover .folder-name {
-      color: #000;
-      text-shadow: none;
-    }
+  box-shadow:
+  0 0 30px rgba(228, 20, 20, 0.652);
 
-    .folder-icon {
-      width: 60px;
-      height: 45px;
-      background: #ff0033;
-      clip-path: polygon(0% 15%, 35% 15%, 45% 0%, 100% 0%, 100% 100%, 0% 100%);
-      margin-bottom: 8px;
-    }
+  transition:.3s;
+}
 
-    .menu-item:hover .folder-icon {
-      background: #000;
-    }
+.window:hover{
+  transform:scale(1.05);
+}
 
-    .folder-name {
-      color: #ff0033;
-      font-size: 1.3rem;
-      text-align: center;
-      text-shadow: 0 0 5px rgba(255, 0, 51, 0.6);
-    }
+.window-header{
+  padding:8px 12px;
+  background:rgba(41, 88, 92, 0.961);
+  border-bottom:1px solid rgba(255,255,255,.2);
+}
 
-    /* Navigational Media Link Objects */
-    .media-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      background: rgba(0,0,0,0.8);
-      border: 1px solid #00ff66;
-      padding: 10px;
-      margin-bottom: 8px;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-    }
+.window-content{
+  padding:10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:120px;
+}
 
-    .clickable-image {
-      border: 0;
-      width: 100px;
-      height: 100px;
-      margin-bottom: 8px;
-      object-fit: contain;
-      transition: transform 0.3s ease;
-    }
+.window-content img{
+  width:100%;
+  max-width:180px;
+  height:auto;
+  image-rendering:pixelated;
+  transition:0.3s;
+}
 
-    .media-card:hover .clickable-image {
-      transform: scale(1.1) rotate(2deg);
-    }
+.window:hover .window-content img{
+  transform:scale(1.08);
+}
 
-    .caption {
-      font-size: 1.1rem;
-      color: #00ff66;
-      margin-top: 6px;
-      text-shadow: 0 0 5px rgba(0,255,102,0.5);
-    }
+.music{
+  left:5%;
+  top:25%;
+}
 
-    /* Interactive Alert Box Terminal */
-    .alert-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #000;
-      border: 2px solid #00ff66;
-      padding: 25px;
-      box-shadow: 0 0 30px rgba(0, 255, 102, 0.4);
-      z-index: 2000;
-      display: block;
-      text-align: center;
-      width: 420px;
-      max-width: 85%;
-    }
+.p5{
+  left:20%;
+  top:60%;
+}
 
-    .alert-box p {
-      margin: 0 0 20px 0;
-      font-size: 1.8rem;
-      line-height: 1.3;
-      color: #00ff66;
-    }
+.about{
+  right:18%;
+  top:25%;
+}
 
-    .alert-box button {
-      background-color: transparent;
-      color: #00ff66;
-      border: 1px solid #00ff66;
-      padding: 8px 20px;
-      font-family: 'Geo', monospace;
-      font-size: 1.4rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
+.portfolio{
+  right:10%;
+  top:70%;
+}
 
-    .alert-box button:hover {
-      background-color: #00ff66;
-      color: #000;
-    }
+.portal{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
 
-    /* Screen Breakpoint Responsive Adjustments */
-    @media (max-width: 1024px) {
-      #title { font-size: 3.5rem; left: 20px; top: 15px; }
-      .lefttable, .righttable { top: auto; bottom: 20px; flex-direction: row; gap: 15px; }
-      .lefttable { left: 20px; }
-      .righttable { right: 20px; }
-      #face-mesh-emulator { width: 95vw; height: auto; max-width: 640px; }
-    }
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 
-    @media (max-width: 640px) {
-      #title { font-size: 2.5rem; width: 100%; text-align: center; left: 0; }
-      .lefttable { display: none; } /* Hide technical tables on compact mobiles to avoid overlap */
-      .righttable { left: 50%; right: auto; transform: translateX(-50%); bottom: 15px; width: max-content; }
-      .media-card { padding: 6px; }
-      .clickable-image { width: 70px; height: 70px; }
-    }
+  text-decoration:none;
+  color:white;
+
+  z-index:50;
+}
+
+.portal img{
+  width:180px;
+  transition:.4s;
+}
+
+.portal:hover img{
+  transform:scale(1.15) rotate(3deg);
+}
+
+.portal span{
+  margin-top:10px;
+  font-size:1.3rem;
+}
+#crt{
+
+position:fixed;
+inset:0;
+
+pointer-events:none;
+
+z-index:999;
+
+background:
+repeating-linear-gradient(
+  transparent,
+  transparent 0.5px,
+  rgba(255,255,255,.03) 3px
+);
+}
   </style>
 </head>
 
 <body>
 
-  <div id="title">Amelie Vorchheimer</div>
-    
+  <div id="crt"></div>
 
-  <div class="lefttable">
-    <div class="menu-item" onclick="window.location.href='music.html'">
-      <div class="folder-icon"></div>
-      <div class="folder-name">Music</div>
-    </div>
-    <div class="menu-item" onclick="window.location.href='p5collection.html'">
-      <div class="folder-icon"></div>
-      <div class="folder-name">p5.js Projects</div>
-    </div>
-  </div>
+  <div id="sketch-container"></div>
 
-  <div class="righttable">
-  <div class="clickable-image" onclick="window.location.href='index2.html'">
-    <div class="media-card"> 
-      <a href="index2.html">
-        <img src="eye1.gif" alt="Go Button" class="clickable-image">
-      </a>
-      <div class="caption">LOAD_VIDEOS</div>
-    </div>
-
-    <div class="clickable-image" onclick="window.location.href='index2.html'">
-      <div class="media-card"> 
-        <a href="aboutme3.html">
-          <img src="Pixel Emoji1.gif" alt="Go Button" class="clickable-image">
-        </a>
-        <div class="caption">ACCESS_ABOUT</div>
+  <h1 id="title">Amelie Vorchheimer</h1>
+  
+  <div class="desktop">
+  
+    <a href="music.html" class="window music">
+      <div class="window-header">♫  MUSIC</div>
+      <div class="window-content">
+        <img src="eye1.gif" alt="Music">
       </div>
-        <div class="clickable-image" onclick="window.location.href='index2.html'">
-          <div class="media-card"> 
-            <a href="past works.html">
-              <img src="star1.gif" alt="Go Button" class="clickable-image">
-            </a>
-            <div class="caption">VIEW_PORTFOLIO</div>
-
-          </div>
-          
+    </a>
+  
+    <a href="p5collection.html" class="window p5">
+      <div class="window-header">◉  P5.JS PROJECTS</div>
+      <div class="window-content">
+        <img src="Pixel Emoji1.gif" alt="p5">
+      </div>
+    </a>
+  
+    <a href="aboutme3.html" class="window about">
+      <div class="window-header">☺  ABOUT</div>
+      <div class="window-content">
+        <img src="star1.gif" alt="abt">
+      </div>
+    </a>
+  
+    <a href="past works.html" class="window portfolio">
+      <div class="window-header">❖ PORTFOLIO</div>
+      <div class="window-content">
+        <img src="Red Heart.gif" alt="port">
+      </div>
+    </a>
+  
+    <a href="index2.html" class="portal">
+        <video src="Untitled (5).mp4" autoplay loop muted playsinline></video>
+      <span>LOAD VIDEOS</span>
+    </a>
+  
   </div>
-</script>
+<script>
+  
+  let particles=[];
+
+  function setup(){
+  
+    let cnv=createCanvas(windowWidth,windowHeight);
+    cnv.parent("sketch-container");
+  
+    for(let i=0;i<150;i++){
+  
+      particles.push({
+  
+        x:random(width),
+        y:random(height),
+  
+        vx:random(-0.5,0.5),
+        vy:random(-0.5,0.5)
+      });
+    }
+  }
+  
+  function draw(){
+  
+    background(8,5,15,40);
+  
+    stroke(255,255,255,30);
+  
+    for(let p of particles){
+  
+      p.x+=p.vx;
+      p.y+=p.vy;
+  
+      if(p.x<0)p.x=width;
+      if(p.x>width)p.x=0;
+      if(p.y<0)p.y=height;
+      if(p.y>height)p.y=0;
+  
+      noStroke();
+      fill(255,100);
+      circle(p.x,p.y,3);
+  
+      for(let q of particles){
+  
+        let d=dist(p.x,p.y,q.x,q.y);
+  
+        if(d<120){
+  
+          stroke(255,15);
+          line(p.x,p.y,q.x,q.y);
+        }
+      }
+    }
+  }
+  
+  function windowResized(){
+    resizeCanvas(windowWidth,windowHeight);
+  }
+
+  </script>
+
     
 </body> 
 </html>
