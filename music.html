@@ -67,26 +67,48 @@
       pointer-events: none;
     }
 
-    .content-window{
+    .window{
+  position:absolute;
+  width:260px;
+  text-decoration:none;
+  color:white;
 
-  width:min(900px,90vw);
+  background:rgba(255,255,255,.08);
 
-  margin:120px auto 120px auto;
+  backdrop-filter:blur(12px);
 
-  background:rgba(5,1,12,.8);
-
-  backdrop-filter:blur(8px);
-
-  border:2px solid #6f45d9;
+  border: 2px dashed #680e6d;
 
   box-shadow:
-  0 0 30px rgba(111,69,217,.25);
+  0 0 30px rgba(228, 20, 20, 0.652);
 
-  padding:2rem;
+  transition:.3s;
+}
 
-  position:relative;
+.window:hover{
+  transform:scale(1.05);
+}
 
-  z-index:20;
+.window-header{
+  padding:8px 12px;
+  background:rgba(41, 88, 92, 0.961);
+  border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+.window-content{
+  padding:10px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:120px;
+}
+
+.window-content img{
+  width:100%;
+  max-width:180px;
+  height:auto;
+  image-rendering:pixelated;
+  transition:0.3s;
 }
     .top-left {
       font-size: 5rem;
@@ -249,14 +271,15 @@
 <body>
   <div id="overlay">
     <div class="top-left">Amelie Vorchheimer</div>
-<div class="content-window">
-    <div class="h2">Links --> </div>
+<div class="window">
+    <div class="window-header">Links --> </div>
 
 <p>
  <a href="https://soundcloud.com/c4ptch4" target="_blank" rel="noopener noreferrer">soundcloud</a><br><br>
   <a href="https://www.youtube.com/@C4PTCH4_04" target="_blank" rel="noopener noreferrer">Youtube</a><br><br>
 <br>
 </p>
+  </div>
     <div class="bottom-right">
       <a href="open2.html">
         <img src="red house.gif" alt="Go Button" class="clickable-image">
@@ -264,7 +287,6 @@
       <div class="caption">home again!?</div>
     </div>
   </div>
-      </div>
 </body>
   <script>
 let turtleX;
