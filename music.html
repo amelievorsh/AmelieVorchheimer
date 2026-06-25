@@ -67,6 +67,27 @@
       pointer-events: none;
     }
 
+    .content-window{
+
+  width:min(900px,90vw);
+
+  margin:120px auto 120px auto;
+
+  background:rgba(5,1,12,.8);
+
+  backdrop-filter:blur(8px);
+
+  border:2px solid #6f45d9;
+
+  box-shadow:
+  0 0 30px rgba(111,69,217,.25);
+
+  padding:2rem;
+
+  position:relative;
+
+  z-index:20;
+}
     .top-left {
       font-size: 5rem;
       color: #cd0011;
@@ -228,7 +249,7 @@
 <body>
   <div id="overlay">
     <div class="top-left">Amelie Vorchheimer</div>
-
+<div class="content-window">
     <div class="h2">Links --> </div>
 
 <p>
@@ -243,6 +264,7 @@
       <div class="caption">home again!?</div>
     </div>
   </div>
+      </div>
 </body>
   <script>
 let turtleX;
