@@ -1,275 +1,433 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Amelie's World - Terminal Portal</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
-  
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
-  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
-  
-  <style>
- body{
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Amelie Vorchheimer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geo&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+
+<style>
+
+*{
   margin:0;
-  overflow:hidden;
-  font-family:'Geo',sans-serif;
-  background:black;
+  padding:0;
+  box-sizing:border-box;
 }
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:black;
+  font-family:'Geo',sans-serif;
+}
+
+/* ---------- P5 BACKGROUND ---------- */
 
 #sketch-container{
   position:fixed;
   inset:0;
-  z-index:0;
+  z-index:1;
 }
 
-.desktop{
-  position:relative;
-  width:100vw;
-  height:100vh;
-  z-index:10;
+/* ---------- CRT ---------- */
+
+body::after{
+
+  content:"";
+
+  position:fixed;
+  inset:0;
+
+  pointer-events:none;
+
+  z-index:999;
+
+  background:
+  repeating-linear-gradient(
+    transparent,
+    transparent 2px,
+    rgba(255,255,255,.03) 3px
+  );
 }
 
-#title{
+/* ---------- TITLE ---------- */
+
+#title-container{
+
   position:absolute;
-  top:30px;
+
+  top:8%;
+
   left:50%;
+
   transform:translateX(-50%);
-  font-size: 6rem;
-      color: #680e6d;
-      letter-spacing: 4px;
-      text-shadow: 0 0 10px #730099;
-      z-index: 10;
-      text-transform: uppercase;
-  z-index:100;
-  text-shadow:0 0 20px rgba(197, 27, 166, 0.648);
+
+  text-align:center;
+
+  z-index:20;
 }
 
-.window{
+h1{
+
+  font-size:6rem;
+
+  color:#6f45d9;
+
+  font-weight:normal;
+
+  text-shadow:
+  0 0 15px rgba(111,69,217,.5);
+}
+
+h2{
+
+  font-size:2rem;
+
+  font-weight:normal;
+
+  color:#6f45d9;
+}
+
+/* ---------- LINES ---------- */
+
+.line{
+
   position:absolute;
+
+  height:2px;
+
+  background:rgba(111,69,217,.45);
+
+  z-index:15;
+}
+
+.line1{
+
   width:260px;
-  text-decoration:none;
-  color:white;
 
-  background:rgba(255,255,255,.08);
+  top:18%;
 
-  backdrop-filter:blur(12px);
+  left:50%;
 
-  border: 2px dashed #680e6d;
+  transform:rotate(-45deg);
+}
 
-  box-shadow:
-  0 0 30px rgba(228, 20, 20, 0.652);
+.line2{
+
+  width:420px;
+
+  top:18%;
+
+  left:58%;
+
+  transform:rotate(-72deg);
+}
+
+/* ---------- MAIN PORTAL ---------- */
+
+#portal{
+
+  position:absolute;
+
+  left:50%;
+
+  top:58%;
+
+  transform:translate(-50%,-50%);
+
+  z-index:20;
+}
+
+#portal img{
+
+  width:700px;
+
+  max-width:60vw;
+
+  transition:.4s;
+
+  filter:
+  drop-shadow(0 0 15px rgba(111,69,217,.4));
+}
+
+#portal:hover img{
+
+  transform:scale(1.02);
+}
+
+/* ---------- GIF BUTTONS ---------- */
+
+.navgif{
+
+  position:absolute;
+
+  z-index:25;
+}
+
+.navgif img{
+
+  width:120px;
+
+  border:none;
+
+  background:none;
 
   transition:.3s;
+
+  filter:
+  drop-shadow(0 0 8px rgba(111,69,217,.4));
 }
 
-.window:hover{
-  transform:scale(1.05);
+.navgif:hover img{
+
+  transform:scale(1.15);
+
+  filter:
+  drop-shadow(0 0 15px #6f45d9);
 }
 
-.window-header{
-  padding:8px 12px;
-  background:rgba(41, 88, 92, 0.961);
-  border-bottom:1px solid rgba(255,255,255,.2);
+/* positions */
+
+.gif1{
+  left:18%;
+  top:42%;
 }
 
-.window-content{
-  padding:10px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:120px;
-}
-
-.window-content img{
-  width:100%;
-  max-width:180px;
-  height:auto;
-  image-rendering:pixelated;
-  transition:0.3s;
-}
-
-.window:hover .window-content img{
-  transform:scale(1.08);
-}
-
-.music{
-  left:5%;
-  top:25%;
-}
-
-.p5{
-  left:20%;
-  top:60%;
-}
-
-.about{
-  right:18%;
-  top:25%;
-}
-
-.portfolio{
-  right:10%;
+.gif2{
+  left:25%;
   top:70%;
 }
 
-.portal{
+.gif3{
+  right:20%;
+  top:72%;
+}
+
+.gif4{
+  right:12%;
+  top:52%;
+}
+
+/* ---------- TICKER ---------- */
+
+#ticker{
+
+  position:fixed;
+
+  bottom:0;
+
+  left:0;
+
+  width:100%;
+
+  height:45px;
+
+  background:black;
+
+  border-top:2px dashed #6f45d9;
+
+  overflow:hidden;
+
+  z-index:100;
+}
+
+#tickerText{
+
   position:absolute;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  white-space:nowrap;
 
-  text-decoration:none;
-  color:white;
+  color:#6f45d9;
 
-  z-index:50;
+  line-height:45px;
+
+  animation:scrollText 28s linear infinite;
 }
 
-.portal img{
-  width:180px;
-  transition:.4s;
+@keyframes scrollText{
+
+  from{
+    transform:translateX(100%);
+  }
+
+  to{
+    transform:translateX(-100%);
+  }
 }
 
-.portal:hover img{
-  transform:scale(1.15) rotate(3deg);
+@media(max-width:900px){
+
+  h1{
+    font-size:3.5rem;
+  }
+
+  h2{
+    font-size:1.3rem;
+  }
+
+  #portal img{
+    width:90vw;
+  }
+
+  .navgif img{
+    width:80px;
+  }
 }
 
-.portal span{
-  margin-top:10px;
-  font-size:1.3rem;
-}
-#crt{
-
-position:fixed;
-inset:0;
-
-pointer-events:none;
-
-z-index:999;
-
-background:
-repeating-linear-gradient(
-  transparent,
-  transparent 0.5px,
-  rgba(255,255,255,.03) 3px
-);
-}
-  </style>
+</style>
 </head>
 
 <body>
 
-  <div id="crt"></div>
+<div id="sketch-container"></div>
 
-  <div id="sketch-container"></div>
+<div id="title-container">
 
-  <h1 id="title">Amelie Vorchheimer</h1>
-  
-  <div class="desktop">
-  
-    <a href="music.html" class="window music">
-      <div class="window-header">♫  MUSIC</div>
-      <div class="window-content">
-        <img src="eye1.gif" alt="Music">
-      </div>
-    </a>
-  
-    <a href="p5collection.html" class="window p5">
-      <div class="window-header">◉  P5.JS PROJECTS</div>
-      <div class="window-content">
-        <img src="Pixel Emoji1.gif" alt="p5">
-      </div>
-    </a>
-  
-    <a href="aboutme3.html" class="window about">
-      <div class="window-header">☺  ABOUT</div>
-      <div class="window-content">
-        <img src="star1.gif" alt="abt">
-      </div>
-    </a>
-  
-    <a href="past works.html" class="window portfolio">
-      <div class="window-header">❖ PORTFOLIO</div>
-      <div class="window-content">
-        <img src="Red Heart.gif" alt="port">
-      </div>
-    </a>
-  
-    <a href="index2.html" class="portal">
-      <img src="red house.gif">
-      <span>LOAD VIDEOS</span>
-    </a>
-  
+  <h1>Amelie Vorchheimer</h1>
+
+  <h2>artist • researcher • creative technologist</h2>
+
+</div>
+
+<div class="line line1"></div>
+<div class="line line2"></div>
+
+<a href="index2.html" id="portal">
+  <img src="red house.gif" alt="">
+</a>
+
+<a href="music.html" class="navgif gif1">
+  <img src="eye1.gif" alt="">
+</a>
+
+<a href="aboutme3.html" class="navgif gif2">
+  <img src="Pixel Emoji1.gif" alt="">
+</a>
+
+<a href="past works.html" class="navgif gif3">
+  <img src="star1.gif" alt="">
+</a>
+
+<a href="p5collection.html" class="navgif gif4">
+  <img src="computer.gif" alt="">
+</a>
+
+<div id="ticker">
+
+  <div id="tickerText">
+
+    I acknowledge the Traditional Custodians of the land on which this work is created and presented. I pay my respects to Elders past and present and extend that respect to all Aboriginal and Torres Strait Islander peoples.
+
   </div>
-<script>
-  
-  let particles=[];
 
-  function setup(){
-  
-    let cnv=createCanvas(windowWidth,windowHeight);
-    cnv.parent("sketch-container");
-  
-    for(let i=0;i<150;i++){
-  
-      particles.push({
-  
-        x:random(width),
-        y:random(height),
-  
-        vx:random(-0.5,0.5),
-        vy:random(-0.5,0.5)
-      });
-    }
+</div>
+
+<script>
+
+/* --------- GENERATIVE BACKGROUND --------- */
+
+let particles=[];
+let words=[
+"sound",
+  "connection",
+  "conversation",
+  "Interact",
+  "attention",
+"memory",
+"body",
+"archive",
+"signal",
+"network",
+"code",
+"vision"
+];
+
+function setup(){
+
+  let c=createCanvas(windowWidth,windowHeight);
+  c.parent("sketch-container");
+
+  for(let i=0;i<120;i++){
+
+    particles.push({
+
+      x:random(width),
+      y:random(height),
+
+      vx:random(-0.4,0.4),
+      vy:random(-0.4,0.4)
+    });
   }
-  
-  function draw(){
-  
-    background(8,5,15,40);
-  
-    stroke(255,255,255,30);
-  
-    for(let p of particles){
-  
-      p.x+=p.vx;
-      p.y+=p.vy;
-  
-      if(p.x<0)p.x=width;
-      if(p.x>width)p.x=0;
-      if(p.y<0)p.y=height;
-      if(p.y>height)p.y=0;
-  
-      noStroke();
-      fill(255,100);
-      circle(p.x,p.y,3);
-  
-      for(let q of particles){
-  
-        let d=dist(p.x,p.y,q.x,q.y);
-  
-        if(d<120){
-  
-          stroke(255,15);
-          line(p.x,p.y,q.x,q.y);
-        }
+
+  textFont('Geo');
+}
+
+function draw(){
+
+  background(0,15);
+
+  for(let p of particles){
+
+    p.x+=p.vx;
+    p.y+=p.vy;
+
+    if(p.x<0)p.x=width;
+    if(p.x>width)p.x=0;
+
+    if(p.y<0)p.y=height;
+    if(p.y>height)p.y=0;
+
+    fill(111,69,217,120);
+    noStroke();
+
+    circle(p.x,p.y,3);
+
+    for(let q of particles){
+
+      let d=dist(p.x,p.y,q.x,q.y);
+
+      if(d<100){
+
+        stroke(111,69,217,20);
+
+        line(
+          p.x,p.y,
+          q.x,q.y
+        );
       }
     }
   }
-  
-  function windowResized(){
-    resizeCanvas(windowWidth,windowHeight);
+
+  fill(111,69,217,25);
+
+  textSize(18);
+
+  for(let i=0;i<words.length;i++){
+
+    text(
+      words[i],
+      (frameCount*0.2+i*180)%width,
+      100+i*70
+    );
   }
+}
 
-  </script>
+function windowResized(){
 
-    
-</body> 
+  resizeCanvas(
+    windowWidth,
+    windowHeight
+  );
+}
+
+</script>
+
+</body>
 </html>
