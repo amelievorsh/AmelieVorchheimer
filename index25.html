@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FACE_MESH_TRACKER - Animated Triangles</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.10.0/p5.js"></script>
+  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
+  <style>
+    :root {
+      --tracker-color: #00ff64;
+      --tracker-name: "FACE_MESH_TRACKER";
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Courier New', monospace;
+      background: #000;
+      color: var(--tracker-color);
+      overflow: hidden;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      border: 2px solid var(--tracker-color);
+      max-width: 400px;
+      font-size: 12px;
+    }
+
+    #status {
+      color: var(--tracker-color);
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .data-point {
+      font-size: 12px;
+      margin: 5px 0;
+      color: var(--tracker-color);
+    }
+
+    #meshInfo {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid var(--tracker-color);
+    }
+
+    #sendStatus {
+      margin-top: 15px;
+      padding-top: 10px;
+      border-top: 1px solid var(--tracker-color);
+      font-size: 11px;
+      color: #888;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    .active {
+      color: #0f0;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    <div id="status">● FACE_MESH_TRACKER - ACTIVE</div>
+    <div id="data">
+      <div class="data-point">FACES DETECTED: 0</div>
+      <div class="data-point">KEYPOINTS: 0</div>
+    </div>
+    <div id="meshInfo">
+      <div class="data-point">TRIANGLES: 0</div>
+      <div class="data-point">ANIMATION TIME: 0.00s</div>
+      <div class="data-point">AMPLITUDE: 3px</div>
+      <div class="data-point">FREQUENCY: 0.7</div>
+    </div>
+    <div id="sendStatus">Initializing storage...</div>
+  </div>
+
+  <script>
+    /* ============================================
+       CONFIGURATION
+       ============================================ */
+    const CONFIG = {
+      trackerName: 'FACE_MESH_TRACKER',
+      storageKey: 'face_mesh_data',  // Shared storage key
+      sendInterval: 1000,            // Send data every 1 second
+      amplitude: 9,
+      frequency: 1.2
+    };
+
+    let sendCount = 0;
+
+    // Face Mesh variables
+    let video;
+    let faceMesh;
+    let faces = [];
+    let triangles;
+    let t = 0;
+
+    /* ============================================
+       CROSS-DEVICE STORAGE FUNCTIONS
+       ============================================ */
+    
+
+    /* ============================================
+       DATA TRACKING
+       ============================================ */
+    
+    function calculateMeshMetrics() {
+      if (faces.length === 0) return null;
+
+      let face = faces[0];
+      let keypoints = face.keypoints;
+
+      // Calculate face center
+      let centerX = 0, centerY = 0;
+      for (let kp of keypoints) {
+        centerX += kp.x;
+        centerY += kp.y;
+      }
+      centerX /= keypoints.length;
+      centerY /= keypoints.length;
+
+      // Calculate average distance from center
+      let avgDistance = 0;
+      for (let kp of keypoints) {
+        avgDistance += dist(kp.x, kp.y, centerX, centerY);
+      }
+      avgDistance /= keypoints.length;
+
+      // Get specific landmarks
+      let noseTip = keypoints[1];
+      let leftEye = keypoints[33];
+      let rightEye = keypoints[263];
+      let mouth = keypoints[13];
+
+      return {
+        tracker: CONFIG.trackerName,
+        timestamp: Date.now(),
+        facesDetected: faces.length,
+        keypoints: keypoints.length,
+        triangles: triangles.length,
+        animationTime: t.toFixed(2),
+        faceCenter: {
+          x: centerX.toFixed(2),
+          y: centerY.toFixed(2)
+        },
+        faceSize: avgDistance.toFixed(2),
+        noseTip: {
+          x: noseTip.x.toFixed(2),
+          y: noseTip.y.toFixed(2)
+        },
+        eyeCenter: {
+          x: ((leftEye.x + rightEye.x) / 2).toFixed(2),
+          y: ((leftEye.y + rightEye.y) / 2).toFixed(2)
+        },
+        mouthPosition: {
+          x: mouth.x.toFixed(2),
+          y: mouth.y.toFixed(2)
+        }
+      };
+    }
+
+    function updateUI() {
+      const dataDiv = document.getElementById('data');
+      const meshDiv = document.getElementById('meshInfo');
+      
+      if (faces.length > 0) {
+        let face = faces[0];
+        
+        dataDiv.innerHTML = `
+          <div class="data-point active">FACES DETECTED: ${faces.length}</div>
+          <div class="data-point">KEYPOINTS: ${face.keypoints.length}</div>
+        `;
+
+        meshDiv.innerHTML = `
+          <div class="data-point">TRIANGLES: ${triangles.length}</div>
+          <div class="data-point">ANIMATION TIME: ${t.toFixed(2)}s</div>
+          <div class="data-point">AMPLITUDE: ${CONFIG.amplitude}px</div>
+          <div class="data-point">FREQUENCY: ${CONFIG.frequency}</div>
+        `;
+      } else {
+        dataDiv.innerHTML = `
+          <div class="data-point">FACES DETECTED: 0</div>
+          <div class="data-point">KEYPOINTS: 0</div>
+        `;
+
+        meshDiv.innerHTML = `
+          <div class="data-point">TRIANGLES: ${triangles ? triangles.length : 0}</div>
+          <div class="data-point">ANIMATION TIME: ${t.toFixed(2)}s</div>
+          <div class="data-point">AMPLITUDE: ${CONFIG.amplitude}px</div>
+          <div class="data-point">FREQUENCY: ${CONFIG.frequency}</div>
+        `;
+      }
+    }
+
+    /* ============================================
+       P5.JS SETUP AND DRAW
+       ============================================ */
+    
+    function gotFaces(results) {
+      faces = results;
+    }
+
+    function preload() {
+      faceMesh = ml5.faceMesh({ maxFaces: 1, flipped: true });
+    }
+
+    function setup() {
+      createCanvas(windowWidth, windowHeight);
+      video = createCapture(VIDEO, { flipped: true });
+      video.size(windowWidth, windowHeight);
+      video.hide();
+      
+      faceMesh.detectStart(video, gotFaces);
+      triangles = faceMesh.getTriangles();
+
+      console.log('🎥 FACE_MESH_TRACKER initialized with cross-device storage');
+      
+      // Initialize storage status
+      document.getElementById('sendStatus').innerHTML = 
+        `✓ Storage initialized - Data will sync across devices`;
+    }
+
+    function draw() {
+      background(0);
+      video.loadPixels();
+      
+      if (faces.length > 0) {
+        let face = faces[0];
+        
+        beginShape(TRIANGLES);
+        noFill();
+        stroke(0, 255, 100, 180);
+        strokeWeight(1);
+        
+        for (let i = 0; i < triangles.length; i++) {
+          let tri = triangles[i];
+          let [a, b, c] = tri;
+          
+          let pointA = face.keypoints[a];
+          let pointB = face.keypoints[b];
+          let pointC = face.keypoints[c];
+          
+          // Apply animation to point A
+          let amp = CONFIG.amplitude;
+          let freq = CONFIG.frequency;
+          let ax = pointA.x + sin(t + i * freq) * amp / PI;
+          let ay = pointA.y;
+          
+          // Draw triangle
+          vertex(ax, ay);
+          vertex(pointB.x, pointB.y);
+          vertex(pointC.x, pointC.y);
+        }
+        
+        endShape();
+        
+        t += 0.03;
+      }
+
+      updateUI();
+    }
+
+    // Send data at intervals
+    setInterval(() => {
+      sendMeshData();
+    }, CONFIG.sendInterval);
+  </script>
+</body>
+</html>

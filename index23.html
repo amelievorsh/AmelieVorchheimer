@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/p5.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.11.8/lib/addons/p5.sound.min.js"></script>
+<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <meta charset="utf-8" />
+
+  </head>
+  <body>
+    <main>
+    </main>
+    <script>   
+let video;
+let bodyPose;
+let poses = [];
+let connections;
+
+// Store gesture messages per body
+let gestureMessages = [];
+
+function preload() {
+  bodyPose = ml5.bodyPose('MoveNet', {
+    flipped: true,
+    maxPoseDetection: 30,
+    multiPose: true
+  });
+}
+
+function setup() {
+  createCanvas(windowWidth, windowHeight);
+  video = createCapture(VIDEO);
+  video.size(width, height);
+  video.hide(); // Don't show webcam
+
+  bodyPose.detectStart(video, gotPoses);
+  connections = bodyPose.getSkeleton();
+  frameRate(60);
+}
+
+function draw() {
+  background(0);
+ fill(160, 32, 240);
+      strokeWeight(1);
+      textSize(30);
+      textAlign(CENTER);
+      text("Stand up for full interactivity", windowWidth/2, windowHeight*0.1);
+  
+
+  // Draw each person's skeleton and detect gestures
+  for (let pose of poses) {
+    drawSkeleton(pose);
+    detectGestures(pose);
+  }
+
+  // Show gesture labels above each person's head for 1 second
+  let now = millis();
+  for (let msg of gestureMessages) {
+    if (now < msg.timestamp + 1000) {
+      fill(160, 32, 240);
+      noStroke();
+      textSize(40);
+      textAlign(CENTER);
+      text(msg.message, msg.x, msg.y - 40);
+    }
+  }
+
+  // Remove expired messages
+  gestureMessages = gestureMessages.filter(m => now < m.timestamp + 1000);
+}
+
+function drawSkeleton(pose) {
+  // Draw keypoints
+  for (let kp of pose.keypoints) {
+    if (kp.confidence > 0.2) {
+      fill(160, 32, 240);
+      noStroke();
+      circle(kp.x, kp.y, 10);
+    }
+  }
+
+  // Draw connections
+  for (let i = 0; i < connections.length; i++) {
+    let [aIndex, bIndex] = connections[i];
+    let a = pose.keypoints[aIndex];
+    let b = pose.keypoints[bIndex];
+    if (a && b && a.confidence > 0.1 && b.confidence > 0.1) {
+      stroke(160, 32, 240); // purple
+      strokeWeight(3);
+      line(a.x, a.y, b.x, b.y);
+    }
+  }
+}
+
+function detectGestures(pose) {
+  let kp = name => pose.keypoints.find(k => k.name === name && k.confidence > 0.2);
+
+  let lw = kp("left_wrist");
+  let rw = kp("right_wrist");
+  let le = kp("left_elbow");
+  let re = kp("right_elbow");
+  let lk = kp("left_knee");
+  let rk = kp("right_knee");
+  let ls = kp("left_shoulder");
+  let rs = kp("right_shoulder");
+  let leye = kp("left_eye");
+  let reye = kp("right_eye");
+  let nose = kp("nose");
+
+  if (!nose) return;
+
+  let gestures = [];
+
+  // G1: Hands together
+  if (lw && rw && dist(lw.x, lw.y, rw.x, rw.y) < 50) {
+    gestures.push("Hands together");
+  }
+
+  // G2: Right arm raised
+  if (rw && reye && rw.y < reye.y) {
+    gestures.push("Right arm raised");
+  }
+
+  // G3: Left arm raised
+  if (lw && leye && lw.y < leye.y) {
+    gestures.push("Left arm raised");
+  }
+
+  // G4: T-pose
+  if (lw && rw && ls && rs &&
+    abs(lw.y - ls.y) < 50 && abs(rw.y - rs.y) < 50 &&
+    abs(ls.y - rs.y) < 50) {
+    gestures.push("T-pose");
+  }
+
+  // G5: Hands on knees
+  if (lw && rw && lk && rk &&
+    dist(lw.x, lw.y, lk.x, lk.y) < 60 &&
+    dist(rw.x, rw.y, rk.x, rk.y) < 60) {
+    gestures.push("Hands on knees");
+  }
+
+  // G6: Arms crossed
+  if (le && rw && re && lw &&
+    dist(le.x, le.y, rw.x, rw.y) < 60 &&
+    dist(re.x, re.y, lw.x, lw.y) < 60) {
+    gestures.push("Arms crossed");
+  }
+
+  // Store messages with nose coords
+  for (let msg of gestures) {
+    gestureMessages.push({
+      message: msg,
+      x: nose.x, // snapshot of position
+      y: nose.y,
+      timestamp: millis()
+    });
+  }
+}
+
+function gotPoses(results) {
+  poses = results;
+}
+
+</script>
+</body>
+</html>
