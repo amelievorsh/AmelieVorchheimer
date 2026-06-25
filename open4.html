@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Amelie's World - Terminal Portal</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.11.13/lib/addons/p5.sound.min.js"></script>
+  <script src="https://unpkg.com/ml5@1/dist/ml5.min.js"></script>
+  
+  <style>
+ body{
+  margin:0;
+  overflow:hidden;
+  font-family:'Geo',sans-serif;
+  background:black;
+}
+
+#sketch-container{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+.desktop{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  z-index:10;
+}
+
+#title{
+  position:absolute;
+  top:30px;
+  left:50%;
+  transform:translateX(-50%);
+  color:white;
+  font-size:5rem;
+  letter-spacing:4px;
+  z-index:100;
+  text-shadow:0 0 20px rgba(255,255,255,.3);
+}
+
+.window{
+  position:absolute;
+  width:260px;
+  text-decoration:none;
+  color:white;
+
+  background:rgba(255,255,255,.08);
+
+  backdrop-filter:blur(12px);
+
+  border:1px solid rgba(255,255,255,.3);
+
+  box-shadow:
+  0 0 30px rgba(255,255,255,.08);
+
+  transition:.3s;
+}
+
+.window:hover{
+  transform:scale(1.05);
+}
+
+.window-header{
+  padding:8px 12px;
+  background:rgba(255,255,255,.15);
+  border-bottom:1px solid rgba(255,255,255,.2);
+}
+
+.window-content{
+  padding:20px;
+  font-size:1.2rem;
+}
+
+.music{
+  left:10%;
+  top:25%;
+}
+
+.p5{
+  left:20%;
+  top:60%;
+}
+
+.about{
+  right:18%;
+  top:25%;
+}
+
+.portfolio{
+  right:12%;
+  top:60%;
+}
+
+.portal{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  text-decoration:none;
+  color:white;
+
+  z-index:50;
+}
+
+.portal img{
+  width:180px;
+  transition:.4s;
+}
+
+.portal:hover img{
+  transform:scale(1.15) rotate(3deg);
+}
+
+.portal span{
+  margin-top:10px;
+  font-size:1.3rem;
+}
+  </style>
+</head>
+
+<body>
+
+  <div id="sketch-container"></div>
+
+  <h1 id="title">Amelie Vorchheimer</h1>
+  
+  <div class="desktop">
+  
+    <a href="music.html" class="window music">
+      <div class="window-header">♫ MUSIC</div>
+      <div class="window-content">
+        experimental sound works
+      </div>
+    </a>
+  
+    <a href="p5collection.html" class="window p5">
+      <div class="window-header">◉ P5.JS PROJECTS</div>
+      <div class="window-content">
+        creative coding archive
+      </div>
+    </a>
+  
+    <a href="aboutme3.html" class="window about">
+      <div class="window-header">☺ ABOUT</div>
+      <div class="window-content">
+        artist bio
+      </div>
+    </a>
+  
+    <a href="past works.html" class="window portfolio">
+      <div class="window-header">▣ PORTFOLIO</div>
+      <div class="window-content">
+        selected works
+      </div>
+    </a>
+  
+    <a href="index2.html" class="portal">
+      <img src="red house.gif">
+      <span>LOAD VIDEOS</span>
+    </a>
+  
+  </div>
+<scrpit>
+  
+  let particles=[];
+
+  function setup(){
+  
+    let cnv=createCanvas(windowWidth,windowHeight);
+    cnv.parent("sketch-container");
+  
+    for(let i=0;i<150;i++){
+  
+      particles.push({
+  
+        x:random(width),
+        y:random(height),
+  
+        vx:random(-0.5,0.5),
+        vy:random(-0.5,0.5)
+      });
+    }
+  }
+  
+  function draw(){
+  
+    background(8,5,15,40);
+  
+    stroke(255,255,255,30);
+  
+    for(let p of particles){
+  
+      p.x+=p.vx;
+      p.y+=p.vy;
+  
+      if(p.x<0)p.x=width;
+      if(p.x>width)p.x=0;
+      if(p.y<0)p.y=height;
+      if(p.y>height)p.y=0;
+  
+      noStroke();
+      fill(255,100);
+      circle(p.x,p.y,3);
+  
+      for(let q of particles){
+  
+        let d=dist(p.x,p.y,q.x,q.y);
+  
+        if(d<120){
+  
+          stroke(255,15);
+          line(p.x,p.y,q.x,q.y);
+        }
+      }
+    }
+  }
+  
+  function windowResized(){
+    resizeCanvas(windowWidth,windowHeight);
+  }
+
+</scrpit>
+
+    
+</body> 
+</html>
