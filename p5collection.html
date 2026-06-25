@@ -163,6 +163,31 @@ height:calc(100% - 40px);
 border:none;
 }
 
+   .bottom-right {
+      position: fixed;
+   top: 30px;
+      left: 60px;
+      text-align: center;
+      z-index: 20;
+    }
+
+        .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 150px;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #ff0000;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
+    }
   </style>
 </head>
 <body> 
@@ -219,6 +244,13 @@ border:none;
       <canvas id="idleCanvas"></canvas>
     </div>
   </div>
+
+       <div class="bottom-right">
+      <a href="open2.html">
+        <img src="Pixel Emoji1.gif" alt="Go Button" class="clickable-image">
+      </a>
+      <div class="caption">home again!?</div>
+    </div>
 </body>
 
 </html>
