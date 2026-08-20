@@ -14,10 +14,11 @@
 }
 
 body {
-    font-family: 'Geo', sans-serif;
-    background-color: #000000;
-    margin: 0;
-    padding: 0;
+  font-family: 'Geo', sans-serif;
+  background-color: #000000;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
 }
 
 /* Style the header */
@@ -27,29 +28,33 @@ header {
   text-align: center;
   font-size: 2.1875rem;
   color: rgb(16, 3, 3);
+  width: 100%;
 }
 
 h1 {
   font-family: 'Geo', sans-serif;
-  font-size: 6rem;
+  /* Fluid font sizing: min 2.8rem, scales with viewport, max 6rem */
+  font-size: clamp(2.8rem, 8vw, 6rem);
   color: #6f45d9;
   font-weight: normal;
   text-align: center;
   text-shadow: 0 0 0.9375rem rgba(111,69,217,.5);
   margin: 0.5rem 0;
+  word-wrap: break-word;
 }
 
 h2 {
   font-family: 'Geo', sans-serif;
-  font-size: 2rem;
+  font-size: clamp(1.2rem, 4vw, 2rem);
   font-weight: normal;
   color: #6f45d9;
   text-align: center;
+  padding: 0 1rem;
 }
 
 p {
   font-family: 'Geo', sans-serif;
-  font-size: 2rem;
+  font-size: clamp(1.2rem, 3.5vw, 2rem);
   color: #6f45d9;
 }
 
@@ -77,8 +82,8 @@ section::after {
 .dropbtn {
   background-color: #232323;
   color: rgb(122, 30, 191);
-  padding: 1.25rem;
-  font-size: 3.375rem;
+  padding: 0.8rem 1.25rem;
+  font-size: clamp(2rem, 5vw, 3.375rem);
   border: 0.3rem dashed #6f45d9;
   cursor: pointer;
 }
@@ -92,7 +97,7 @@ section::after {
   padding-top: 2%;
   font-family: 'Geo', sans-serif;
   font-size: 1.8rem;    
-  color: rgbrgb(16, 3, 3);
+  color: rgb(16, 3, 3);
   background-color: #000000;
   min-width: 12.5rem;
   box-shadow: 0rem 0.5rem 1rem 0rem rgba(0,0,0,0.2);
@@ -130,14 +135,6 @@ footer {
   text-align: center;
   font-size: 2rem;
   color: rgb(206, 105, 224);
-}
-
-/* Responsive layout */
-@media (max-width: 37.5rem) {
-  nav, article {
-    width: 100%;
-    height: auto;
-  }
 }
 
 .line {
@@ -184,7 +181,7 @@ footer {
 
 .ticker-item {
   white-space: nowrap;
-  font-size: 2rem;
+  font-size: clamp(1.2rem, 3vw, 2rem);
   color: #6f45d9;
   line-height: 3.5rem;
   padding-right: 3rem;
@@ -204,6 +201,23 @@ footer {
   border: 0.15rem dashed #6f45d9;
   margin: 0 auto;
   padding: 0%;   
+}
+
+/* Mobile & Tablet Specific Adjustments */
+@media (max-width: 48rem) {
+  nav, article {
+    width: 100%;
+    height: auto;
+    float: none;
+  }
+
+  .line1, .line2 {
+    display: none; /* Prevents overflow issues from absolute lines on small viewports */
+  }
+  /* Enable tap toggling fallback visual for mobile hover states */
+  .dropdown:active .dropdown-content {
+    display: block;
+  }
 }
 </style>
 </head>
