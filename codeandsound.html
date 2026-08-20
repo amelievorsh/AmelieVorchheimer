@@ -1,0 +1,997 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Past Projects - Amelie Vorchheimer</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <link href="https://fonts.googleapis.com/css2?family=Geo:ital@0;1&display=swap" rel="stylesheet">
+
+  <style>
+
+    #body {
+      font-family: 'Geo', sans-serif;
+      background: black;
+      color: white;
+      overflow: hidden;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    #desktop {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      z-index: 10;
+      display: flex;
+      padding: 4rem;
+    }
+
+
+    #backgroundCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    #header {
+      position: absolute;
+      top: 2rem;
+      left: 4rem;
+
+      font-family: 'Geo', sans-serif;
+
+      color: #6f45d9;
+
+      filter:
+        repeating-linear-gradient(
+          transparent,
+          transparent 0.03125rem,
+          rgba(234, 166, 166, 0.19) 0.1875rem
+        );
+    }
+
+    #header h1 {
+      font-size: 5rem;
+      font-weight: normal;
+      letter-spacing: 3rem;
+    }
+
+    #header p {
+      font-size: 1.4rem;
+      left: 6.25rem;
+    }
+
+
+    #sidebar {
+      width: 15.625rem;
+
+      display: flex;
+
+      flex-direction: column;
+
+      gap: 2rem;
+
+      margin-top: 7.5rem;
+    }
+
+
+    .folder {
+      width: 11.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: 0.3s;
+    }
+
+    .folder:hover {
+      transform: translateX(2rem);
+    }
+
+
+    /* =========================
+       FOLDER ICON
+    ========================= */
+
+    .folder-icon {
+      width: 3.75rem;
+      height: 3.75rem;
+      flex-shrink: 0;
+      background: #6f45d9;
+      outline: rgb(84, 130, 172) 0.5rem solid;
+
+      clip-path:
+        polygon(
+          0% 20%,
+          35% 20%,
+          45% 0%,
+          100% 0%,
+          100% 100%,
+          0% 100%
+        );
+
+      box-shadow:
+        0 0 0.625rem rgba(111, 69, 217, 0.6);
+    }
+
+    .folder span {
+      padding-left: 1rem;
+      color: #6f45d9;
+      font-family: 'Geo', sans-serif;
+      font-size: 1.3rem;
+      display: flex;
+      white-space: normal;
+      overflow-wrap: break-word;
+      max-width: 7.5rem;
+    }
+
+    #viewer {
+      flex: 1;
+      margin-left: 3.125rem;
+      margin-top: 6.25rem;
+      border: 0.125rem solid #6f45d9;
+      background: black;
+      position: relative;
+      overflow: hidden;
+    }
+
+
+
+    #window-bar {
+      height: 3.125rem;
+      border-bottom: 0.0625rem solid #6f45d9;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 0.9375rem;
+      font-family: 'Geo', sans-serif;
+      color: #6f45d9;
+    }
+
+    #window-bar button {
+      background: none;
+      border: none;
+      color: #6f45d9;
+      font-family: 'Geo', sans-serif;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    #sketch-frame {
+      width: 100%;
+      height: calc(100% - 2.5rem);
+      border: none;
+    }
+
+
+    .bottom-right {
+      position: fixed;
+      top: 2rem;
+      right: 4rem;
+      text-align: center;
+      z-index: 20;
+    }
+
+    .clickable-image {
+      border: 0;
+      cursor: pointer;
+      width: 9.375rem;
+      transition: transform 0.3s ease;
+    }
+
+    .clickable-image:hover {
+      transform: scale(1.05);
+    }
+
+    .caption {
+      font-size: 0.8rem;
+      color: #6f45d9;
+      margin-top: 0.3rem;
+      animation: blink 1s steps(1) infinite;
+    }
+
+    #music-popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 100;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      padding: 5%;
+    }
+
+    .music-window {
+      width: 70%;
+      max-width: 50rem;
+      min-height: 40%;
+      background: black;
+      border: 0.125rem solid #6f45d9;
+      box-shadow:
+        0 0 1.5rem rgba(111, 69, 217, 0.6);
+      position: relative;
+      color: #6f45d9;
+      font-family: 'Geo', sans-serif;
+    }
+
+    .music-window-bar {
+      height: 3.125rem;
+      border-bottom: 0.0625rem solid #6f45d9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+    }
+
+    .music-window-bar span {
+      font-size: 1.2rem;
+    }
+
+    .music-close {
+      background: none;
+      border: none;
+      color: #6f45d9;
+      font-family: 'Geo', sans-serif;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .music-close:hover {
+      color: white;
+    }
+
+    .music-content {
+      padding: 3rem;
+      text-align: center;
+    }
+
+    .music-content h2 {
+      font-size: 2rem;
+      font-weight: normal;
+      margin-bottom: 1rem;
+    }
+
+    .music-content p {
+      font-size: 1.1rem;
+      margin-bottom: 2rem;
+    }
+
+    .music-links {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .music-links a {
+      color: #6f45d9;
+      font-size: 1.3rem;
+      text-decoration: none;
+      border: 0.0625rem solid #6f45d9;
+      padding: 0.75rem 2rem;
+      width: 60%;
+      transition: 0.3s;
+    }
+
+    .music-links a:hover {
+      background: #6f45d9;
+      color: black;
+      transform: translateX(0.5rem);
+    }
+
+
+    @media (max-width: 48rem) {
+
+      #desktop {
+        padding: 2rem;
+      }
+
+      #header {
+        top: 1.5rem;
+        left: 2rem;
+      }
+
+      #header h1 {
+        font-size: 3rem;
+        letter-spacing: 1rem;
+      }
+
+      #header p {
+        font-size: 1rem;
+      }
+
+      #sidebar {
+        width: 35%;
+        gap: 3rem;
+        margin-top: 10rem;
+      }
+
+      .folder {
+        width: 100%;
+      }
+
+      .folder-icon {
+        width: 2.75rem;
+        height: 2.75rem;
+        outline-width: 0.3rem;
+      }
+
+      .folder span {
+        font-size: 1rem;
+        padding-left: 0.5rem;
+        max-width: 6rem;
+      }
+
+      #viewer {
+        margin-left: 1rem;
+        margin-top: 10rem;
+      }
+
+      .bottom-right {
+        top: 1.5rem;
+        right: 2rem;
+      }
+
+      .clickable-image {
+        width: 6rem;
+      }
+
+      .music-window {
+        width: 90%;
+        min-height: 45%;
+      }
+
+      .music-content {
+        padding: 2rem 1rem;
+      }
+
+      .music-content h2 {
+        font-size: 1.5rem;
+      }
+
+      .music-content p {
+        font-size: 1rem;
+      }
+
+      .music-links a {
+        width: 90%;
+        font-size: 1.1rem;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+  <canvas id="backgroundCanvas"></canvas>
+  <div id="desktop">
+    <div id="header">
+
+      <h1>P5.JS PROJECTS</h1>
+      <p>Select a folder to launch a sketch</p>
+
+    </div>
+
+    <div id="sidebar">
+
+      <div
+        class="folder"
+        onclick="loadSketch('index22.html')">
+        <div class="folder-icon"></div>
+        <span>I heard</span>
+      </div>
+
+      <div
+        class="folder"
+        onclick="loadSketch('index25.html')">
+
+        <div class="folder-icon"></div>
+        <span>Ways We See</span>
+      </div>
+
+      <div
+        class="folder"
+        onclick="loadSketch('index23.html')">
+        <div class="folder-icon"></div>
+        <span>The Omission of Self awareness</span>
+      </div>
+
+      <div
+        class="folder"
+        onclick="loadSketch('index24.html')">
+        <div class="folder-icon"></div>
+        <span>Algorythmic Meditations</span>
+      </div>
+
+      <div
+        class="folder"
+        onclick="openMusic()">
+        <div class="folder-icon"></div>
+        <span>Music</span>
+      </div>
+    </div>
+
+
+    <!-- VIEWER -->
+
+    <div id="viewer">
+
+      <div id="window-bar">
+
+        <span id="window-title">
+          i dont know what
+        </span>
+
+        <button onclick="closeSketch()">
+          ×
+        </button>
+
+      </div>
+
+
+      <iframe
+        id="sketch-frame"
+        src=""
+        style="display:none;">
+      </iframe>
+
+
+      <canvas id="idleCanvas"></canvas>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       HOME BUTTON
+  ========================= -->
+
+  <div class="bottom-right">
+
+    <a href="open2.html">
+
+      <img
+        src="Pixel Emoji1.gif"
+        alt="Go Button"
+        class="clickable-image"
+      >
+
+    </a>
+
+    <div class="caption">
+      home again!?
+    </div>
+
+  </div>
+
+
+  <!-- =========================
+       MUSIC POPUP
+  ========================= -->
+
+  <div
+    id="music-popup"
+    onclick="closeMusicOutside(event)"
+  >
+
+    <div
+      class="music-window"
+      onclick="event.stopPropagation()"
+    >
+
+
+      <!-- WINDOW BAR -->
+
+      <div class="music-window-bar">
+
+        <span>
+          MUSIC
+        </span>
+
+        <button
+          class="music-close"
+          onclick="closeMusic()"
+        >
+          ×
+        </button>
+
+      </div>
+
+
+      <!-- CONTENT -->
+
+      <div class="music-content">
+
+        <h2>
+          mixes, music, sound
+        </h2>
+
+        <p>
+          Under the alias C4PTCH4, I create music and sound art. You can find some my work in the links below. 
+          Always learning, always experimenting, always glitching.
+        </p>
+
+
+        <div class="music-links">
+
+          <!-- Replace these URLs with your actual links -->
+
+          <a
+            href="https://soundcloud.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            SoundCloud
+          </a>
+
+          <a
+            href="https://www.youtube.com/@C4PTCH4_04"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Youtube
+          </a>
+
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+
+    /* =========================
+       SKETCH LOADING
+    ========================= */
+
+    function loadSketch(file) {
+
+      document.getElementById("idleCanvas")
+        .style.display = "none";
+
+      const frame =
+        document.getElementById("sketch-frame");
+
+      frame.style.display = "block";
+
+      frame.src = file;
+
+      document.getElementById(
+        "window-title"
+      ).innerHTML = file;
+    }
+
+
+    /* =========================
+       CLOSE SKETCH
+    ========================= */
+
+    function closeSketch() {
+
+      const frame =
+        document.getElementById("sketch-frame");
+
+      frame.style.display = "none";
+
+      frame.src = "";
+
+      document.getElementById(
+        "window-title"
+      ).innerHTML = "CAT_OS";
+
+      document.getElementById(
+        "idleCanvas"
+      ).style.display = "block";
+    }
+
+
+    /* =========================
+       OPEN MUSIC POPUP
+    ========================= */
+
+    function openMusic() {
+
+      document.getElementById(
+        "music-popup"
+      ).style.display = "flex";
+
+    }
+
+
+    /* =========================
+       CLOSE MUSIC POPUP
+    ========================= */
+
+    function closeMusic() {
+
+      document.getElementById(
+        "music-popup"
+      ).style.display = "none";
+
+    }
+
+
+    /* =========================
+       CLOSE WHEN CLICKING
+       OUTSIDE THE WINDOW
+    ========================= */
+
+    function closeMusicOutside(event) {
+
+      if (
+        event.target ===
+        document.getElementById("music-popup")
+      ) {
+
+        closeMusic();
+
+      }
+
+    }
+
+
+    /* =========================
+       INTERACTIVE BACKGROUND
+    ========================= */
+
+    const canvas =
+      document.getElementById('backgroundCanvas');
+
+    const ctx =
+      canvas.getContext('2d');
+
+
+    canvas.width =
+      window.innerWidth;
+
+    canvas.height =
+      window.innerHeight;
+
+
+    let mouseX =
+      canvas.width / 2;
+
+    let mouseY =
+      canvas.height / 2;
+
+    let particles = [];
+
+
+    /* =========================
+       PARTICLE CLASS
+    ========================= */
+
+    class Particle {
+
+      constructor(x, y) {
+
+        this.x = x;
+
+        this.y = y;
+
+        this.size =
+          Math.random() * 3 + 1;
+
+        this.speedX =
+          Math.random() * 3 - 1.5;
+
+        this.speedY =
+          Math.random() * 3 - 1.5;
+
+        this.life = 100;
+
+      }
+
+
+      update() {
+
+        this.x += this.speedX;
+
+        this.y += this.speedY;
+
+
+        const dx =
+          mouseX - this.x;
+
+        const dy =
+          mouseY - this.y;
+
+        const distance =
+          Math.sqrt(
+            dx * dx +
+            dy * dy
+          );
+
+
+        if (distance < 100) {
+
+          const force =
+            (100 - distance) / 100;
+
+          this.x -=
+            (dx / distance) *
+            force *
+            2;
+
+          this.y -=
+            (dy / distance) *
+            force *
+            2;
+
+        }
+
+
+        this.life -= 0.5;
+
+      }
+
+
+      draw() {
+
+        ctx.fillStyle =
+          `rgba(100, 0, 200, ${this.life / 100})`;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          this.x,
+          this.y,
+          this.size,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.fill();
+
+
+        ctx.strokeStyle =
+          `rgba(100, 0, 200, ${this.life / 200})`;
+
+        ctx.lineWidth = 0.5;
+
+        ctx.beginPath();
+
+        ctx.arc(
+          this.x,
+          this.y,
+          this.size * 2,
+          0,
+          Math.PI * 2
+        );
+
+        ctx.stroke();
+
+      }
+
+    }
+
+
+    /* =========================
+       ANIMATION
+    ========================= */
+
+    function animate() {
+
+      ctx.fillStyle =
+        'rgba(0, 0, 0, 0.05)';
+
+      ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      if (Math.random() < 0.3) {
+
+        particles.push(
+          new Particle(
+            Math.random() *
+              canvas.width,
+
+            Math.random() *
+              canvas.height
+          )
+        );
+
+      }
+
+
+      for (
+        let i = particles.length - 1;
+        i >= 0;
+        i--
+      ) {
+
+        particles[i].update();
+
+        particles[i].draw();
+
+
+        if (
+          particles[i].life <= 0
+        ) {
+
+          particles.splice(i, 1);
+
+        }
+
+      }
+
+
+      /* =========================
+         PARTICLE CONNECTIONS
+      ========================= */
+
+      for (
+        let i = 0;
+        i < particles.length;
+        i++
+      ) {
+
+        for (
+          let j = i + 1;
+          j < particles.length;
+          j++
+        ) {
+
+          const dx =
+            particles[i].x -
+            particles[j].x;
+
+          const dy =
+            particles[i].y -
+            particles[j].y;
+
+          const distance =
+            Math.sqrt(
+              dx * dx +
+              dy * dy
+            );
+
+
+          if (distance < 80) {
+
+            ctx.strokeStyle =
+              `rgba(
+                100,
+                0,
+                200,
+                ${(1 - distance / 80) * 0.2}
+              )`;
+
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+
+            ctx.moveTo(
+              particles[i].x,
+              particles[i].y
+            );
+
+            ctx.lineTo(
+              particles[j].x,
+              particles[j].y
+            );
+
+            ctx.stroke();
+
+          }
+
+        }
+
+      }
+
+
+      /* =========================
+         MOUSE GLOW
+      ========================= */
+
+      const gradient =
+        ctx.createRadialGradient(
+          mouseX,
+          mouseY,
+          0,
+          mouseX,
+          mouseY,
+          100
+        );
+
+
+      gradient.addColorStop(
+        0,
+        'rgba(100, 0, 200, 0.1)'
+      );
+
+      gradient.addColorStop(
+        1,
+        'rgba(100, 0, 200, 0)'
+      );
+
+
+      ctx.fillStyle = gradient;
+
+      ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+
+      requestAnimationFrame(
+        animate
+      );
+
+    }
+
+
+    document.addEventListener(
+      'mousemove',
+      (e) => {
+
+        mouseX = e.clientX;
+
+        mouseY = e.clientY;
+
+
+        if (Math.random() < 0.5) {
+
+          particles.push(
+            new Particle(
+              mouseX,
+              mouseY
+            )
+          );
+
+        }
+
+      }
+    );
+
+    window.addEventListener(
+      'resize',
+      () => {
+
+        canvas.width =
+          window.innerWidth;
+
+        canvas.height =
+          window.innerHeight;
+
+      }
+    );
+
+    animate();
+
+
+  </script>
+
+</body>
+
+</html>
+```
