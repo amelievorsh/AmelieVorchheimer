@@ -424,13 +424,9 @@
       </div>
     </div>
 
-
-    <!-- VIEWER -->
-
+    
     <div id="viewer">
-
       <div id="window-bar">
-
         <span id="window-title">
           i dont know what
         </span>
@@ -438,40 +434,17 @@
         <button onclick="closeSketch()">
           ×
         </button>
-
       </div>
-
-
-      <iframe
-        id="sketch-frame"
-        src=""
-        style="display:none;">
+ <iframe id="sketch-frame"src=""style="display:none;">
       </iframe>
 
-
       <canvas id="idleCanvas"></canvas>
-
     </div>
-
   </div>
 
-
-  <!-- =========================
-       HOME BUTTON
-  ========================= -->
-
   <div class="bottom-right">
-
-    <a href="open2.html">
-
-      <img
-        src="Pixel Emoji1.gif"
-        alt="Go Button"
-        class="clickable-image"
-      >
-
-    </a>
-
+    <a href="open4.html">
+      <imgsrc="Pixel Emoji1.gif" alt="Go Button"class="clickable-image"> </a>
     <div class="caption">
       home again!?
     </div>
@@ -479,83 +452,33 @@
   </div>
 
 
-  <!-- =========================
-       MUSIC POPUP
-  ========================= -->
 
-  <div
-    id="music-popup"
-    onclick="closeMusicOutside(event)"
-  >
+  <div id="music-popup"onclick="closeMusicOutside(event)" >
 
-    <div
-      class="music-window"
-      onclick="event.stopPropagation()"
-    >
-
-
-      <!-- WINDOW BAR -->
+    <div   class="music-window"  onclick="event.stopPropagation()" >
 
       <div class="music-window-bar">
-
         <span>
           MUSIC
         </span>
-
-        <button
-          class="music-close"
-          onclick="closeMusic()"
-        >
-          ×
-        </button>
-
+        <button  class="music-close"   onclick="closeMusic()" >  ×  </button>
       </div>
-
-
-      <!-- CONTENT -->
 
       <div class="music-content">
 
-        <h2>
-          mixes, music, sound
-        </h2>
+        <h2> mixes, music, sound </h2>
 
-        <p>
-          Under the alias C4PTCH4, I create music and sound art. You can find some my work in the links below. 
-          Always learning, always experimenting, always glitching.
-        </p>
+        <p> Under the alias C4PTCH4, I create music and sound art. You can find some my work in the links below. 
+          Always learning, always experimenting, always glitching. </p>
 
 
         <div class="music-links">
-
-          <!-- Replace these URLs with your actual links -->
-
-          <a
-            href="https://soundcloud.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            SoundCloud
-          </a>
-
-          <a
-            href="https://www.youtube.com/@C4PTCH4_04"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Youtube
-          </a>
-
-
+          <a href="https://soundcloud.com/"  target="_blank"rel="noopener noreferrer"> SoundCloud </a>
+          <a href="https://www.youtube.com/@C4PTCH4_04" target="_blank"rel="noopener noreferrer" > Youtube  </a>
         </div>
-
       </div>
-
     </div>
-
   </div>
-
-
   <script>
 
 
@@ -579,21 +502,13 @@
         "window-title"
       ).innerHTML = file;
     }
-
-
-    /* =========================
-       CLOSE SKETCH
-    ========================= */
-
+    
     function closeSketch() {
 
       const frame =
         document.getElementById("sketch-frame");
-
       frame.style.display = "none";
-
       frame.src = "";
-
       document.getElementById(
         "window-title"
       ).innerHTML = "CAT_OS";
@@ -603,30 +518,12 @@
       ).style.display = "block";
     }
 
-
-    /* =========================
-       OPEN MUSIC POPUP
-    ========================= */
-
     function openMusic() {
-
-      document.getElementById(
-        "music-popup"
-      ).style.display = "flex";
-
+      document.getElementById(  "music-popup" ).style.display = "flex";
     }
 
-
-    /* =========================
-       CLOSE MUSIC POPUP
-    ========================= */
-
     function closeMusic() {
-
-      document.getElementById(
-        "music-popup"
-      ).style.display = "none";
-
+      document.getElementById( "music-popup" ).style.display = "none";
     }
 
 
@@ -637,21 +534,10 @@
 
     function closeMusicOutside(event) {
 
-      if (
-        event.target ===
-        document.getElementById("music-popup")
-      ) {
-
+      if ( event.target === document.getElementById("music-popup")  ) {
         closeMusic();
-
       }
-
     }
-
-
-    /* =========================
-       INTERACTIVE BACKGROUND
-    ========================= */
 
     const canvas =
       document.getElementById('backgroundCanvas');
@@ -675,10 +561,6 @@
 
     let particles = [];
 
-
-    /* =========================
-       PARTICLE CLASS
-    ========================= */
 
     class Particle {
 
